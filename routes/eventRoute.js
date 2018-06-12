@@ -3,7 +3,8 @@
 * Testing:
   GET: curl http://localhost:3000/events
   GET (one): curl http://localhost:3000/events/<uuid>
-  POST: curl -d '{"userEmail": "<valid email>", "textField": "<valid text>"}' -X POST http://localhost:3000/events
+  POST: curl -d '{"userEmail": "<valid email>", "textField": "<valid text>"}' -H "Content-Type: application/json" -X POST http://localhost:3000/events
+  PATCH: curl -d '{"id": "<uuid>", "packageId": "<uuid>"}' -H "Content-Type: application/json" -X PATCH http://localhost:3000/events/
   DELETE: curl -X DELETE http://localhost:3000/events/<uuid>
 */
 
@@ -116,9 +117,8 @@ router.patch('/:id/:packageId', function(request, result) {
     return result.status(400).json({ error: errors.mapped() });
   };
 
-  // Check these parameters
+  // Hold these parameters: id + packageId
   const params = request.params;
-  console.log(params);
 
   return EventModel.update(params, {ReturnValues: 'ALL_NEW'},
     function(error, data) {
@@ -128,7 +128,6 @@ router.patch('/:id/:packageId', function(request, result) {
       }
       // Succesful update!
       else {
-        console.log('Updated event %s', params.id);
         console.log('Updated Event: ', data.attrs);
         return result.status(200).end();
       };
