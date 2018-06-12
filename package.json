@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "nodemon ./bin/www",
+    "predeploy": "claudia generate-serverless-express-proxy --express-module server",
+    "deploy": "npm run predeploy && claudia create --handler lambda.handler --deploy-proxy-api --region us-east-1"
   },
   "dependencies": {
     "aws-sdk": "^2.255.1",
