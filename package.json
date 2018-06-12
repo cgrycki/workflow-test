@@ -1,0 +1,25 @@
+{
+  "name": "workflow-test",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "nodemon ./bin/www"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.255.1",
+    "aws-serverless-express": "^3.2.0",
+    "body-parser": "^1.18.3",
+    "claudia": "^5.0.0",
+    "cookie-parser": "^1.4.3",
+    "debug": "^2.6.9",
+    "dotenv": "^6.0.0",
+    "dynamodb": "^1.1.2",
+    "express": "^4.16.3",
+    "express-validator": "^5.2.0",
+    "jsonwebtoken": "^8.3.0",
+    "morgan": "^1.9.0",
+    "nodemon": "^1.17.5",
+    "request": "^2.87.0",
+    "simple-oauth2": "^1.6.0"
+  }
+}
