@@ -28,7 +28,9 @@ router.get('/:id',
     eventUtils.validParamId,
     validateParams,
     EventModel.checkEventMiddleware
-  ], (request, response) => response.status(200).json(JSON.stringify(request.item)));
+  ], 
+  (request, response) => response.status(200).json(JSON.stringify(request.item))
+);
 
 // POST events -- Create new Event
 router.post('/', 
@@ -37,11 +39,16 @@ router.post('/',
     eventUtils.validParamUserEmail,
     validateParams,
     EventModel.saveEventMiddleware
-  ], (request, response) => response.status(201).json({"message": "Success"}));
-
+  ], 
+  (request, response) => response.status(201).json({"message": "Success"})
+);
 
 // PATCH events/:id/:packageId -- Updates an event's packageId
-router.patch('/:id/:packageId', [validateParams], function(request, result) {
+router.patch('/:id/:packageId', 
+  [
+    validateParams
+  ], 
+  function(request, result) {
   // Hold these parameters: id + packageId
   const params = request.params;
 
@@ -59,30 +66,15 @@ router.patch('/:id/:packageId', [validateParams], function(request, result) {
     });
 });
 
-
 // DELETE events/:id -- Delete event with given id
 router.delete('/:id', 
   [
     eventUtils.validParamId,
-    validateParams
+    validateParams,
+    EventModel.checkEventMiddleware
   ], 
-  function(request, result) {
-    // Gather params from request
-    const params = request.params;
-    
-    // Delete the event from our DB
-    return EventModel.destroy(params.id, function(error, data) {
-      if (error) {
-        console.error(error);
-        return result.status(400).json({ error: error });
-      }
-      // Otherwise send confirmation the event is deleted.
-      else {
-        console.log('Event with ID %s deleted!', params.id);
-        return result.status(200).end();
-      };
-    });
-  });
+  (request, response) => EventModel.deleteEvent(request, response)
+);
 
 
 module.exports = router;
