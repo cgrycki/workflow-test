@@ -1,0 +1,21 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        // Hide gitignore
+        ".gitignore": true,
+        // Hide environment
+        ".env": true,
+        // Hide Node
+        "node_modules/": true,
+        // Hide VSCode settings
+        ".vscode/": true
+    },
+    // JavaScript editor settings
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": true
+}
