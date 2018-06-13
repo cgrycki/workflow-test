@@ -41,11 +41,20 @@ EventModel.checkEventMiddleware = function(request, response, next) {
   EventModel
     .query(id)
     .exec((error, data) => {
-      // Return errors
+      // If there are any errors, return them
       if (error) return response.status(400).json({ error: JSON.stringify(error) });
-      // Not found
-      else if (data.Items.length === 0) return response.status(204).json({ error: "Not found"});
-      // Exists, next!
+
+      // Otherwise check if this is a POST request, and return an error if it exists
+      else if ((request.method === 'POST') && (data.Items.length !== 0)) {
+        return response.status(400).json({ error: "Event `{id} exists"});
+      }
+
+      // No event found: Return error
+      else if (data.Items.length === 0) {
+        return response.status(404).json({ error: "Not found"});
+      }
+
+      // Exists and we're not trying to create, next middleware!
       else {
         request.item = data.Items[0];
         next();
@@ -99,6 +108,24 @@ EventModel.saveEventMiddleware = function(request, response, next) {
   });
 };
 
+/**
+ * Router callback for DELETE /events. Does not go anywhere after
+ * @param {object} request Express HTTP request.
+ * @param {object} response Express HTTP response to act upon.
+ */
+EventModel.deleteEvent = function(request, response) {
+  // Gather params
+  let id = request.params.id;
+
+  // Delete the event, and return
+  EventModel.destroy(id, (error, data) => {
+    // Report any errors
+    if (error) return response.status(400).json({ error: JSON.stringify(error) });
+
+    // Otherwise send the OK
+    return response.status(200);
+  });
+};
 
 
 module.exports = EventModel;
