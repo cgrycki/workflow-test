@@ -6,7 +6,7 @@
     "start": "nodemon ./bin/www",
     "predeploy": "claudia generate-serverless-express-proxy --express-module server",
     "deploy": "npm run predeploy && TMPDIR=/tmp claudia create --handler lambda.handler --deploy-proxy-api --region us-east-1",
-    "update": "TMPDIR=/tmp claudia update"
+    "update": "npm run predeploy && TMPDIR=/tmp claudia update"
   },
   "dependencies": {
     "aws-sdk": "^2.255.1",
