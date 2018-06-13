@@ -1,4 +1,5 @@
 /* Dependencies -------------------------------------------------------------*/
+require('dotenv').config();
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
@@ -30,5 +31,6 @@ var echoRouter  = require('./routes/echo');
 app.use('/', indexRouter);
 app.use('/events', eventRouter);
 app.use('/echo', echoRouter);
+
 
 module.exports = app;
