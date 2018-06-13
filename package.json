@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "nodemon ./bin/www",
-    "predeploy": "claudia generate-serverless-express-proxy --express-module server",
+    "predeploy": "TMPDIR=/tmp claudia generate-serverless-express-proxy --express-module server",
     "deploy": "npm run predeploy && claudia create --handler lambda.handler --deploy-proxy-api --region us-east-1"
   },
   "dependencies": {
