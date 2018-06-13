@@ -51,8 +51,7 @@ EventModel.checkEventMiddleware = function(request, response, next) {
         next();
       };
     });
-} 
-
+};
 
 /**
  * Router callback function for GET /events. Lists all events in database.
