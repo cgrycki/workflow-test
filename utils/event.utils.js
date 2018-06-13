@@ -6,7 +6,7 @@
 /* Dependencies -------------------------------------------------------------*/
 const { check }  = require('express-validator/check');
 const request    = require('request');
-const EventModel = require('../models/index');
+const EventModel = require('../models/event.model');
 
 
 /* Parameter Utils ----------------------------------------------------------*/

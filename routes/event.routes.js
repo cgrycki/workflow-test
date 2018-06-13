@@ -11,7 +11,7 @@
 /* Router dependencies ------------------------------------------------------*/
 const express   = require('express');
 var    router   = express.Router();
-var EventModel  = require('../models/index');
+var EventModel  = require('../models/event.model');
 
 // TESTING
 const validateParams = require('../utils/index').validateParams;
