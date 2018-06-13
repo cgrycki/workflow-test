@@ -5,6 +5,7 @@
   GET (one): curl http://localhost:3000/events/<uuid>
   POST: curl -d '{"userEmail": "<valid email>", "textField": "<valid text>"}' -H "Content-Type: application/json" -X POST http://localhost:3000/events
   PATCH: curl -d '{"id": "<uuid>", "packageId": "<uuid>"}' -H "Content-Type: application/json" -X PATCH http://localhost:3000/events/
+  PATCH: curl -H "Content-type: application/json" -X PATCH http://localhost:3001/:id/:packageID
   DELETE: curl -X DELETE http://localhost:3000/events/<uuid>
 */
 
@@ -20,7 +21,11 @@ const eventUtils = require('../utils/event.utils');
 
 /* CRUD API -----------------------------------------------------------------*/
 // GET events -- List events
-router.get('/', (request, response) => EventModel.listEvents(request, response));
+router.get('/', 
+  //(request, response) => EventModel.listEvents(request, response));
+  [EventModel.listEventsMiddleware],
+  (request, response) => response.status(200).json(request.items)
+);
 
 // GET events/:id -- Get Event by ID
 router.get('/:id', 
@@ -46,7 +51,9 @@ router.post('/',
 // PATCH events/:id/:packageId -- Updates an event's packageId
 router.patch('/:id/:packageId', 
   [
-    validateParams
+    eventUtils.validParamId,
+    validateParams,
+    EventModel.checkEventMiddleware
   ], 
   function(request, result) {
   // Hold these parameters: id + packageId
