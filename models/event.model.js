@@ -77,6 +77,23 @@ EventModel.listEvents = function(request, response) {
 };
 
 /**
+ * Router callback function for GET /events. Lists all events in database.
+ * @param {object} request Express HTTP request.
+ * @param {object} response Express HTTP response to act upon.
+ */
+EventModel.listEventsMiddleware = function(request, response, next) {
+  EventModel
+    .scan()
+    .exec((error, data) => {
+      if (error) return response.status(400).json({ error: JSON.stringify(error) });
+      else {
+        request.items = data.Items;
+        next();
+      };
+    });
+};
+
+/**
  * Wrapper function for POST /events.
  * @param {object} request Express HTTP request.
  * @param {object} response Express HTTP response to act upon.
@@ -123,7 +140,27 @@ EventModel.deleteEvent = function(request, response) {
     if (error) return response.status(400).json({ error: JSON.stringify(error) });
 
     // Otherwise send the OK
-    return response.status(200);
+    return response.status(200).end();
+  });
+};
+
+/**
+ * Middleware for DELETE /events. 
+ * @param {object} request Express HTTP request.
+ * @param {object} response Express HTTP response to act upon.
+ * @param {function} next
+ */
+EventModel.deleteEventMiddleware = function(request, response, next) {
+  // Gather params
+  let id = request.params.id;
+
+  // Delete the event, and return
+  EventModel.destroy(id, (error, data) => {
+    // Report any errors
+    if (error) return response.status(400).json({ error: JSON.stringify(error) });
+
+    // Otherwise send the OK
+    else next();
   });
 };
 
