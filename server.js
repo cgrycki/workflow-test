@@ -25,8 +25,8 @@ app.use(cookieParser());
 
 // Routes
 var indexRouter = require('./routes/index');
-var eventRouter = require('./routes/eventRoute');
-var echoRouter  = require('./routes/echo');
+var eventRouter = require('./routes/event.routes');
+var echoRouter  = require('./routes/echo.routes');
 
 app.use('/', indexRouter);
 app.use('/events', eventRouter);

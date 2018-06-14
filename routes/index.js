@@ -3,7 +3,8 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.send("<h1>CoPH Test API</h1>");
+  //res.send("<h1>CoPH Test API</h1>");
+  res.redirect('http://localhost:3000');
 });
 
 module.exports = router;
