@@ -13,43 +13,35 @@ const utils     = require('../utils/index');
 const roomUtils = require('../utils/room.utils');
 
 
+/* Parameters? ---*/
+router.param('roomId', roomUtils.validRoomId);
+router.param('date', roomUtils.validDate);
+router.param('startTime', roomUtils.validStartTime);
+router.param('endTime', roomUtils.validEndTime);
+
 
 /* REST ---------------------------------------------------------------------*/
-/* GET /rooms -- List CoPH rooms. */
+/* GET /rooms -- List CoPH rooms as JS objects. */
 router.get('/', (request, response) => roomUtils.getAstraRooms(request, response));
 
 
-/* GET /rooms/:roomId -- Get one room info. */
+/* GET /rooms/:roomId -- Get one room's info. */
 router.get('/:roomId', 
-  [
-    roomUtils.validRoomId,
-    utils.validateParams
-  ],
-  (request, response) => roomUtils.getAstraRoom(request.params.roomId, request, response)
-);
-
-
-/* GET /rooms/:roomId/:startDate/ -- Get one room's schedule on given day. */
-router.get('/:roomId/:date',
-  [
-   roomUtils.validRoomId,
-   roomUtils.validDate,
-   utils.validateParams
-  ],
-  (request, response) => roomUtils.getAstraRoomScheduleDate(request, response)
+  utils.validateParams,
+  (request, response) => roomUtils.getAstraRoom(request, response)
 );
 
 
 /* GET /rooms/:roomId/:date/:startTime-:endTime -- Check if a room is free. */
-router.get('/:roomId/:date/:startTime-:endTime', 
+//http://localhost:3001/rooms/N110/2017-02-07/
+router.get('/:roomId/:date', //:startTime-:endTime', 
   [
-    roomUtils.validRoomId,
-    roomUtils.validDate,
-    roomUtils.validStartTime,
-    roomUtils.validEndTime,
-    utils.validateParams
+    utils.validateParams,
+    roomUtils.addDayMiddleware,
+    roomUtils.getAstraRoomSchedule,
+    roomUtils.formatAstraRoomSchedule
   ],
-  (request, response) => console.log(request.params)
+  (request, response) => response.send(request.roomSchedule)
 );
 
 

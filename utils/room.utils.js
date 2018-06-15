@@ -4,8 +4,9 @@
 
 
 /* Dependencies -------------------------------------------------------------*/
-const requests = require('request');
+const requests  = require('request');
 const { check } = require('express-validator/check');
+const moment    = require('moment');
 
 
 /* Paramater Validation -----------------------------------------------------*/
@@ -13,7 +14,10 @@ const { check } = require('express-validator/check');
 // roomId
 const validRoomId = check('roomId')
   .exists().withMessage('Must have a roomId to access API')
-  .isString();
+  .isString().withMessage('roomId must be a string')
+  .isAlphanumeric().withMessage('roomId must be alphanumeric')
+  .isUppercase().withMessage('Must be uppercased')
+  .trim();
 
 // date
 const validDate = check('date')
@@ -36,14 +40,10 @@ const validEndTime = check('endTime')
 
 /* Utilities ----------------------------------------------------------------*/
 
-// Range check
-
-
-
-// Request MAUI/Astra service room list
-function getAstraRooms(request, response) {
-  const params = {
-    url: 'https://api.maui.uiowa.edu/maui/api/pub/registrar/courses/AstraBldgRmCompleteList/list',
+// DRY Convenience function
+const getAstraURL = api => {
+  return {
+    url: api,
     method: 'GET',
     followRedirect: true,
     accepts: 'application/json',
@@ -51,6 +51,15 @@ function getAstraRooms(request, response) {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
   };
+};
+
+
+
+// Request MAUI/Astra service room list.
+// Optional object filtering???
+function getAstraRooms(request, response) {
+  let url = 'https://api.maui.uiowa.edu/maui/api/pub/registrar/courses/AstraBldgRmCompleteList/list';
+  let params = getAstraURL(url);
   
   // Make the request to Astra 
   requests(params, function(err, res, body) {
@@ -58,126 +67,144 @@ function getAstraRooms(request, response) {
       // Parse list of room objects
       let allRooms = JSON.parse(body);
       
-      // Filter to include CPHB rooms
-      let cphbRooms = allRooms.filter(d => d.buildingCode === 'CPHB');
+      /* Filter to include CPHB rooms. Rooms are objects of shape:
+        {
+          "buildingName": "COLLEGE OF PUBLIC HEALTH BLDG",
+          "buildingCode": "CPHB",
+          "roomNumber": "xxx",
+          "roomName": null/"yyy",
+          "regionList": [...]
+        }
+      */
+      let cphbRooms = allRooms
+        .filter(d => d.buildingCode === 'CPHB');
+        /*.map(d => {
+          return {
+            roomNumber: d.roomNumber, 
+            roomName: d.roomName, 
+            regionList: d.regionList
+          };
+        });*/
       
       // Send filtered list back
-      response.send(JSON.stringify(cphbRooms));
+      response.json(cphbRooms);
     } else {
       response.status(400).send(err);
     }
   });
 }
 
+
 // Get single Astra room's information
-function getAstraRoom(roomNumber, request, response) {
-  const params = {
-    url: 'https://api.maui.uiowa.edu/maui/api/pub/registrar/courses/AstraRoomData/CPHB/' + roomNumber,
-    method: 'GET',
-    accepts: 'application/json',
-    followRedirect: true,
-    json: true,
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }
-  };
+function getAstraRoom(request, response) {
+  const { roomId } = request.params;
+  const url = `https://api.maui.uiowa.edu/maui/api/pub/registrar/courses/AstraRoomData/CPHB/${roomId}`;
+  const params = getAstraURL(url);
   
   requests(params, function(err, res, body) {
-    if (!err && res.statusCode === 200) response.json(body);
-    else response.send(err);
+    if (!err && res.statusCode === 200) response.send(body);
+    else {
+      response.send(err);
+    }
   });
 };
 
 
-// Get Astra room schedule for a given day
-function getAstraRoomScheduleDate(request, response) {
-  // Gather params from request
-  const req_params = request.params;
+
+
+// Format end date to automatically be one day after our start date
+function addDayMiddleware(request, response, next) {
+  // We'll need to add one day, get day in milliseconds
+  const DAY = 60 * 60 * 24 * 1000;
 
   // Parse the date from params
-  let startDateObj = new Date(req_params.date);
-  let DAY = 60 * 60 * 24 * 1000;
+  let startDateObj = new Date(request.params.date);
   let endDateObj = new Date(startDateObj.getTime() + DAY);
 
   // Convert dates back to string
   let startDate = startDateObj.toISOString().split('T')[0];
   let endDate = endDateObj.toISOString().split('T')[0];
+  
+  // Add them to the request and keep going
+  request.startDate = startDate;
+  request.endDate = endDate;
+  next();
+}
 
-  // Create the RESTful header
-  const params = {
-    url: 'https://api.maui.uiowa.edu/maui/api/pub/registrar/courses/AstraRoomSchedule/'
-      + startDate + '/'
-      + endDate + '/CPHB/'
-      + req_params.roomId,
-    method: 'GET',
-    accepts: 'application/json',
-    followRedirect: true,
-    json: true,
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }
-  };
+// Fetch Astra room schedule and attach event list to request
+function getAstraRoomSchedule(request, response, next) {
+  // Variables to fill out our API call
+  const startDate = request.startDate;
+  const endDate   = request.endDate;
+  const roomId    = request.params.roomId;
+
+  // Request parameters
+  const url = `https://api.maui.uiowa.edu/maui/api/pub/registrar/courses/AstraRoomSchedule/${startDate}/${endDate}/CPHB/${roomId}`;
+  const params = getAstraURL(url);
 
   requests(params, function(err, res, body) {
+    // No errors, assign object to request
     if (!err && res.statusCode === 200) {
-      response.status(200).send(body);
-    } else {
-      response.status(404).json({ error: JSON.stringify(err) });
+      request.roomSchedule = JSON.parse(body);
+      next()
+    } 
+    // Nothing returned for the room's schedule
+    else if (!err && res.statusCode === 204) {
+      request.roomSchedule = [];
+      next();
+    } 
+    // There was an error somewhere
+    else {
+      response.status(500).json({ error: err });
     }
   });
 }
 
+/**
+ * Function that formats two strings as a JS Date object
+ * @param {string} date Date formatted as 'MMMM D, YYYY': 'February 7, 2017'
+ * @param {string} time Time formatted as 'h:mmA': '11:00AM'
+ * @return {Date}
+ */
+const formatAstraDate = (date, time) => moment(date +' '+time, "MMMM D, YYYY h:mmA");
 
+// Format event list into consumable JS objects for comparison
+function formatAstraRoomSchedule(request, response, next) {
+  const fmtSchedule = request.roomSchedule.map(d => {
+    // Gather and clean datetime parts
+    let date = d.date.trim();
+    let start = d.startTime.trim();
+    let end = d.endTime.trim();
 
-// Get Astra schedule for room with given :roomId
-function getAstraRoomScheduleTime(request, response) {
-  const req_params = request.params;
-  const params = {
-    url: 'https://api.maui.uiowa.edu/maui/api/pub/registrar/courses/AstraRoomSchedule/' 
-      + req_params.startDate + '/'
-      + req_params.endDate + '/CPHB/' 
-      + req_params.roomNumber,
-      method: 'GET',
-      accepts: 'application/json',
-      followRedirect: true,
-      json: true,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
+    // Convert to JS Date object
+    let startTime = formatAstraDate(date, start);
+    let endTime = formatAstraDate(date, end);
+
+    return { 
+      startTime, 
+      endTime,
+      roomName: d.roomName,
+      roomNumber: d.roomNumber,
+      date: d.date
     };
+  });
 
-    console.log(params.url);
-
-    request(params, function(err, res, body) {
-      // Success
-      if (!err && res.statusCode === 200) {
-
-        console.log(JSON.parse(body));
-        response.status(200).send(body);
-      } else {
-        response.send(404).json({ error: JSON.stringify(err) });
-      }
-    });
+  request.roomSchedule = fmtSchedule;
+  next();
 }
 
 
 
 
-
-// Request sharepoint service
-
-
-
-
-
-
-
-exports.validRoomId              = validRoomId;
-exports.validDate                = validDate;
-exports.validStartTime           = validStartTime;
-exports.validEndTime             = validEndTime;
-
-exports.getAstraRooms            = getAstraRooms;
-exports.getAstraRoom             = getAstraRoom;
-exports.getAstraRoomScheduleDate = getAstraRoomScheduleDate;
-exports.getAstraRoomScheduleTime = getAstraRoomScheduleTime;
+// Params
+exports.validRoomId    = validRoomId;
+exports.validDate      = validDate;
+exports.validStartTime = validStartTime;
+exports.validEndTime   = validEndTime;
+// Kind of working
+exports.getAstraRooms = getAstraRooms;
+exports.getAstraRoom  = getAstraRoom;
+// WIP
+exports.addDayMiddleware   = addDayMiddleware;
+exports.getAstraRoomSchedule = getAstraRoomSchedule;
+exports.formatAstraRoomSchedule = formatAstraRoomSchedule;
