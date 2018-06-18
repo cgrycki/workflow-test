@@ -39,6 +39,15 @@ const validateParams = (request, response, next) => {
   next();
 };
 
+/**
+ * Creates a table name from three different parts
+ * @param {string} app Describes the application client_id
+ * @param {string} env Environment: test or prod
+ * @param {string} table Which table should we create this for?
+ */
+const createTableName = (app, env, table) => app +'-'+env+'-'+table;
+
 
 exports.errorFormatter = errorFormatter;
 exports.validateParams = validateParams;
+exports.createTableName = createTableName;
