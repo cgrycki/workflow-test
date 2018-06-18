@@ -20,7 +20,7 @@ var app = express();
 
 /* Further App Configurations -----------------------------------------------*/
 // Security best practices
-//app.use(helmet());
+app.use(helmet());
 // Logging
 app.use(logger('dev'));
 // For JSON headers
@@ -31,6 +31,9 @@ app.use(validator());
 // And cookies
 app.use(cookieParser());
 
+// Authentication
+//app.use('/', require('./auth/auth.utils').requiresLogin);
+
 
 // Routes
 var indexRouter = require('./routes/index');
@@ -40,6 +43,7 @@ var roomRouter  = require('./rooms/room.routes');
 app.use('/', indexRouter);
 app.use('/events', eventRouter);
 app.use('/rooms', roomRouter);
+app.use('/auth', require('./auth/auth.routes'));
 
 
 module.exports = app;
