@@ -45,6 +45,36 @@ var Room = dynamo.define('Room', {
 });
 
 // RESTful functions
-//
+
+/**
+ * Model function to return a list of rooms as {roomNumber, floor} objects.
+ * @param {any} request Express incoming HTTP request.
+ * @param {any} response Express outgoing HTTP response.
+ */
+Room.getRooms = function(request, response) {
+  Room
+    .scan()
+    .attributes(['roomNumber', 'floor'])
+    .exec((err, data) => {
+      if (err) reponse.send(404).json(err);
+      else response.status(200).json(data.Items);
+    });
+}
+
+Room.getRoom = function(request, response) {
+  // Gather params from request. Verified by the middleware previous.
+  let roomNumber = request.params.roomNumber;
+
+  Room
+    .query(roomNumber)
+    .limit(1)
+    .exec((err, data) => {
+      if (err) response.status(404).json(err);
+      else response.status(200).json(data.Items);
+    });
+}
+
+
+
 
 module.exports = Room;

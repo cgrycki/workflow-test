@@ -12,8 +12,6 @@ const name            = process.env.APP_NAME;
 const env             = process.env.EENV;
 const table           = 'events';
 
-console.log(createTableName(name, env, table));
-
 
 /** Events Model */
 var EventModel = dynamo.define('Event', {
