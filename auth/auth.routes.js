@@ -10,30 +10,33 @@ const authUtils = require('./auth.utils');
 router.get('/', async function(request, response, next) {
   // Get auth code from request
   const code = request.query.code;
+  const token = request.session.token;
 
   if (code) {
     // If user code is present, use it to get a auth token
     let token;
 
-    console.log('User has code, trying to obtain Access token...');
-
     try {
-      token = await authUtils.getAccessToken(code);
+      token = await authUtils.getTokenFromCode(code, request);
+      console.log('After authentication: ', request.session);
+
+      // Token checks out! Send them to the front end
+      response.redirect('http://localhost:3000');
     } catch (error) {
       // Error exchanging auth code for token
       response.send(404).json({ message: "Couldn't exchange code for token"});
     }
-
-    // Token checks out! Send them to the front end
+  } else if (token) { 
+    // User is already logged in.
     response.redirect('http://localhost:3000');
-    
+  
   } else {
-    console.log('Does not have code, redirecting to log in!');
-
     // Otherwise redirect to login site to attempt to get a new code sent to us
-    let redirect_uri = authUtils.getAuthUrl();
-    response.redirect(redirect_uri);
+    response.redirect(authUtils.getAuthUrl());
   };
 });
+
+/* GET /auth/logout -- Destroys a user's session. */
+router.get('/logout', (request, response) => { request.session.destroy() });
 
 module.exports = router;

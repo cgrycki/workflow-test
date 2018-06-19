@@ -4,17 +4,18 @@ var authUtils = require('../auth/auth.utils');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  // Check if we have authenticated the user before
-  const accessToken = req.cookies.uiowa_access_token;
+  /* Check if we have authenticated the user before
+  const accessToken = req.cookies.graph_access_token;
   const userName = req.cookies.uiowa_user_name;
 
-  if (accessToken && userName) {
+  if (accessToken) {
     // Request is authenticated
     res.redirect('http://localhost:3000');
   } else {
-    let signin_url = authUtils.getAuthUrl();
-    res.redirect(signin_url);
-  }
+    res.redirect(authUtils.getAuthUrl());
+  }*/
+
+  res.redirect('http://localhost:3000');
 });
 
 module.exports = router;
