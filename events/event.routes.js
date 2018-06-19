@@ -22,7 +22,6 @@ const eventUtils = require('./event.utils');
 /* CRUD API -----------------------------------------------------------------*/
 // GET events -- List events
 router.get('/', 
-  //(request, response) => EventModel.listEvents(request, response));
   [EventModel.listEventsMiddleware],
   (request, response) => response.status(200).json(request.items)
 );
