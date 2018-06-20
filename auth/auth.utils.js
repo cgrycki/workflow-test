@@ -1,143 +1,189 @@
 /**
- * Authentication Helpers
- * From: https://docs.microsoft.com/en-us/outlook/rest/node-tutorial
+ * Authentication Utilities/Middleware
+ * TBD: Office365 credentials and authentication 'flow'
  */
 
+/* Dependencies --------*/
+const { check } = require('express-validator/check');
+const oauth2    = require('simple-oauth2');
 
-const oauth2_iowa = require('simple-oauth2').create({
+
+/* Credentials ----*/
+const oauth_uiowa = oauth2.create({
   client: {
-    id: process.env.UIOWA_ACCESS_KEY_ID,
+    id    : process.env.UIOWA_ACCESS_KEY_ID,
     secret: process.env.UIOWA_SECRET_ACCESS_KEY,
   },
   auth: {
-    tokenHost: 'https://login.uiowa.edu/uip/',
+    tokenHost    : 'https://login.uiowa.edu/uip/',
     authorizePath: 'auth.page',
-    tokenPath: 'token.page'
-  }
-});
-
-const oauth2_office = require('simple-oauth2').create({
-  client: {
-    id: process.env.OFFICE365_ACCESS_KEY,
-    secret: process.env.OFFICE365_SECRET_ACCESS_KEY
-  },
-  auth: {
-    tokenHost: 'https://login.microsoftonline.com',
-    authorizePath: 'common/oauth2/v2.0/authorize',
-    tokenPath: 'common/oauth2/v2.0/token'
+    tokenPath    : 'token.page'
   }
 });
 
 
-/**
- * Return an OAuth2 URL for our application from app's credentials. 
- */
-function getAuthUrl() {
-  const returnVal = oauth2_iowa.authorizationCode.authorizeURL({
-    type: 'web_server',
+/* Parameters -----------*/
+const validParamCode = check('code').exists().isAlphanumeric();
+
+
+/* Utilities -----------*/
+// Get authorization URL for logging in and redirecting back to  API w/ code.
+function getAuthURL() {
+  const returnVal = oauth_uiowa.authorizationCode.authorizeURL({
+    type         : 'web_server',
     response_type: 'code',
-    redirect_uri: process.env.REDIRECT_URI,
-    scope: process.env.UIOWA_SCOPES
+    redirect_uri : process.env.REDIRECT_URI,
+    scope        : process.env.UIOWA_SCOPES
   });
   return returnVal;
 }
 
-/**
- * Preforms the server handshake to authenticate a user with app's credentails.
- * Saves user token to cookie via saveValuesToSession(token, request)
- * @param {string} auth_code OAuth2 authorization code
- * @param {any} response HTTP Response from Express.
- * @returns {string} access_token User auth token
- */
-async function getTokenFromCode(auth_code, request) {
-  // Get auth token with app/user credentials
-  let result = await oauth2_iowa.authorizationCode.getToken({
-    code: auth_code,
-    redirect_uri: process.env.REDIRECT_URI,
-    scope: process.env.UIOWA_SCOPES
+
+// Preform server handshake with code from getAuthURL(), saves callback data to session
+async function getAuthTokenFromCode(auth_code, request) {
+  /* POST https://login.uiowa.edu/uip/token.page?
+    grant_type    = authorization_code&
+    client_id     = YOUR_CLIENT_ID&
+    client_secret = YOUR_CLIENT_SECRET&
+    code          = AUTHORIZATION_CODE&
+    redirect_uri  = YOUR_REDIRECT_URL
+  */
+  // Get auth token with application+user authorization code
+  let result = await oauth_uiowa.authorizationCode.getToken({
+    grant_type   : 'authorization_code',
+    client_id    : process.env.UIOWA_ACCESS_KEY_ID,
+    client_secret: process.env.UIOWA_SECRET_ACCESS_KEY,
+    code         : auth_code,
+    redirect_uri : process.env.REDIRECT_URI
   });
 
-  // Confirm token
-  const token = oauth2_iowa.accessToken.create(result);
-  //console.log('Token created: ', token.token);
+  // Confirm with the handshake
+  const token = oauth_uiowa.accessToken.create(result);
 
-  // Save values to session, so that we may identify user 
-  // on subsequent HTTP requests.
-  saveValuesToSession(token, request);
+  // Save token values to session
+  saveTokenToSession(token, request);
 
-  return token.token.access_token;
+  return token;
 }
 
-/**
- * Retrieves a cached token, checks expiration, and refreshes if necc.
- * @param {any} cookies 
- * @param {any} request 
- */
-async function getAccessToken(cookies, request) {
-  // Do we have an access token cached?
-  let token = cookies.graph_access_token;
 
-  if (token) {
-    // We have a token, but is it expired?
-    // Expire 5 minutes early to account for clock differences
-    const FIVE_MINUTES = 300000;
-    const expiration = new Date(parseFloat(cookies.graph_token_expires - FIVE_MINUTES));
-    if (expiration > new Date()) {
-      // Token is still good, just return it
-      return token;
+// Saves a user token values to their session
+function saveTokenToSession(token, request) {
+  /* Token = {
+    "access_token":"USER_ACCESS_TOKEN",
+    "refresh_token":"USER_REFRESH_TOKEN",
+    "token_type":"bearer",
+    "expires_in":2592000,
+    "params":{
+      "hawkID": USER_HAWKID,
+      "uid": USER_UNIVERSITY_ID,
+      "scope": YOUR_SCOPE,
+      "issued_to" => YOUR_CLIENT_ID
     }
-  }
+  }*/
+  let sess = request.session;
 
-  // Either no token or it's expired, do we have a 
-  // refresh token?
-  const refresh_token = cookies.graph_refresh_token;
-  if (refresh_token) {
-    const newToken = await oauth2_office.accessToken.create({refresh_token: refresh_token}).refresh();
-    //saveValuesToCookie(newToken, res);
-    saveValuesToSession(newToken, request);
-
-    return newToken.token.access_token;
-  }
-
-  // Nothing in the cookies that helps, return empty
-  return null;
-}
-
-
-function saveValuesToSession(token, request) {
-  // Save the access token to the session
-  request.session.uiowa_access_token = token.token.access_token;
-  // Save the refresh token to the session
-  request.session.uiowa_refresh_token = token.token.refresh_token;
-  // Save the token expiration time to the session.
-  request.session.uiowa_token_expires = token.token.expires_at.getTime()
-  
-  
-  // Save the user's name to the session. Need to decode from token.token.id_token
-  //request.session.graph_user_name = 
+  // Save the access token to session
+  sess.uiowa_access_token = token.token.access_token;
+  // Save refresh token
+  sess.uiowa_refresh_token = token.token.refresh_token;
+  // Save the expiration time
+  sess.expires_in = token.token.expires_in;
+  // Save alphanumeric HawkID
+  sess.hawkID = token.token.params.hawkID;
+  // Save University ID interger
+  sess.uid = token.token.params.uid;
 }
 
 
 
+/* Middleware -----------*/
+// Clears a user's session from the database on logout/timeout
+function clearTokensFromSession(request, response, next) {
+  let sess = request.session;
 
+  // Clear the data
+  sess.uiowa_access_token = undefined;
+  sess.uiowa_refresh_token = undefined;
+  sess.hawkID = undefined;
+  sess.uid = undefined;
 
+  // Double clear the data
+  sess.destroy();
 
-/* TESTING SESSIONS ---------------------------------------------------------*/
+  // Route back to our login URL in our final callback
+  next();
+}
 
+// Checks if a request is verified or not. 
+function checkSession(request, response, next) {
+  let sess = request.session;
 
-
-function requiresLogin(request, response, next) {
-  if (request.session.token || request.query.code) {
+  // Check if they've been here before
+  if (sess && sess.uiowa_access_token) {
+    /* If they have an auth token, check if its timed out
+      if (sess.expires_in > new Date()) {
+        // Not timed out, continue creating/updating/deleteing
+        next();
+      } else {
+        clearTokensFromSession(request, response);
+      }
+    */
+    next();
+  }
+  
+  // Check if this request is being sent to /auth with a valid token
+  if (request.path.endsWith('/auth') && request.query.code) {
     return next();
-  } else {
-    //response.status(404).json({ err: 'You must be logged in to view this page.'});
-    response.redirect(getAuthUrl());
+  }
+
+  // No authenticated session token? send them to entry point
+  if (!sess.uiowa_access_token) {
+    response.status(403).redirect(getAuthURL());
   }
 }
 
+// Authentication handshake with the U. Iowa servers
+async function authenticateCode(request, response, next) {
+  const code = request.query.code;
+  if (code) {
+    // We 'know' that the request came from a whitelisted domain
+    // So use the authentication code to obtain an OAuth2 token
+    let token;
+
+    try {
+      // This will also save our user's values to their session
+      token = await getAuthTokenFromCode(code, request);
+
+      // Token checks out, values are saved. Send them to fill form on client.
+      return next();
+    } catch (error) {
+      console.error(error, error.stack);
+      response.status(500).json({ error: error });
+    }
+  } else {
+    // Who in the world sent this if we didn't have a code?
+    response.status(403).redirect(getAuthURL());
+  }
+}
+
+// Middelware refreshing a session auth, and passing the user details for /events
+function retrieveSession(request, response, next) {
+  let sess = request.session;
+  // Set all the info needed by later middleware in /events.
+  // We need user access (oauth) token to create/update workflow package
+  sess.USER_ACCESS_TOKEN = sess.uiowa_access_token;
+
+  // We need the user's IP address to create/update workflow package
+  sess.USER_IP_ADDRESS = request.ip_address || '0.0.0.0';
+
+  next();
+}
 
 
-exports.getAuthUrl       = getAuthUrl;
-exports.getTokenFromCode = getTokenFromCode;
-exports.getAccessToken   = getAccessToken;
-exports.requiresLogin    = requiresLogin;
+exports.validParamCode         = validParamCode;
+exports.getAuthURL             = getAuthURL;
+exports.clearTokensFromSession = clearTokensFromSession;
+exports.checkSession           = checkSession;
+exports.authenticateCode       = authenticateCode;
+exports.retrieveSession        = retrieveSession;

@@ -17,6 +17,7 @@ var EventModel  = require('./event.model');
 // TESTING
 const validateParams = require('../utils/index').validateParams;
 const eventUtils = require('./event.utils');
+const authUtils = require('../auth/auth.utils');
 
 
 /* CRUD API -----------------------------------------------------------------*/
@@ -42,6 +43,7 @@ router.post('/',
     eventUtils.validParamTextField,
     eventUtils.validParamUserEmail,
     validateParams,
+    authUtils.checkSession,    
     EventModel.saveEventMiddleware
   ], 
   (request, response) => response.status(201).json({"message": "Success"})

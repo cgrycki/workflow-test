@@ -41,11 +41,6 @@ app.use(validator());
 // Authentication check
 //app.use('/', require('./auth/auth.utils').requiresLogin);
 
-// Console log sessions
-app.use('/', (request, response, next) => {
-  console.log(request.session, request.cookies);
-  next();
-});
 
 // Routes
 var indexRouter = require('./routes/index');
@@ -55,7 +50,7 @@ var roomRouter  = require('./rooms/room.routes');
 app.use('/', indexRouter);
 app.use('/events', eventRouter);
 app.use('/rooms', roomRouter);
-//app.use('/auth', require('./auth/auth.routes'));
+app.use('/auth', require('./auth/auth.routes'));
 
 
 module.exports = app;
