@@ -23,7 +23,7 @@ const oauth_uiowa = oauth2.create({
 
 
 /* Parameters -----------*/
-//const validParamCode = check('code').exists().isAlphanumeric();
+const validParamCode = check('code').exists().isAlphanumeric();
 
 
 /* Utilities -----------*/
@@ -59,6 +59,7 @@ async function getAuthTokenFromCode(auth_code, request) {
 
   // Confirm with the handshake
   const token = oauth_uiowa.accessToken.create(result);
+  console.log('token callback from oauth: ', token);
 
   // Save token values to session
   saveTokenToSession(token, request);
@@ -116,7 +117,7 @@ function clearTokensFromSession(request, response, next) {
 }
 
 // Checks if a request is verified or not. 
-async function checkSession(request, response, next) {
+function checkSession(request, response, next) {
   let sess = request.session;
 
   // Check if they've been here before
@@ -181,7 +182,7 @@ function retrieveSession(request, response, next) {
 }
 
 
-//exports.validParamCode   = validParamCode;
+exports.validParamCode         = validParamCode;
 exports.getAuthURL             = getAuthURL;
 exports.clearTokensFromSession = clearTokensFromSession;
 exports.checkSession           = checkSession;
