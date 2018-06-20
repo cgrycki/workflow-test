@@ -11,13 +11,13 @@ const oauth2    = require('simple-oauth2');
 /* Credentials ----*/
 const oauth_uiowa = oauth2.create({
   client: {
-    id: process.env.UIOWA_ACCESS_KEY_ID,
+    id    : process.env.UIOWA_ACCESS_KEY_ID,
     secret: process.env.UIOWA_SECRET_ACCESS_KEY,
   },
   auth: {
-    tokenHost: 'https://login.uiowa.edu/uip/',
+    tokenHost    : 'https://login.uiowa.edu/uip/',
     authorizePath: 'auth.page',
-    tokenPath: 'token.page'
+    tokenPath    : 'token.page'
   }
 });
 
@@ -30,10 +30,10 @@ const validParamCode = check('code').exists().isAlphanumeric();
 // Get authorization URL for logging in and redirecting back to  API w/ code.
 function getAuthURL() {
   const returnVal = oauth_uiowa.authorizationCode.authorizeURL({
-    type: 'web_server',
+    type         : 'web_server',
     response_type: 'code',
-    redirect_uri: process.env.REDIRECT_URI,
-    scope: process.env.UIOWA_SCOPES
+    redirect_uri : process.env.REDIRECT_URI,
+    scope        : process.env.UIOWA_SCOPES
   });
   return returnVal;
 }
@@ -50,7 +50,7 @@ async function getAuthTokenFromCode(auth_code, request) {
   */
   // Get auth token with application+user authorization code
   let result = await oauth_uiowa.authorizationCode.getToken({
-    grant_type   : authorization_code,
+    grant_type   : 'authorization_code',
     client_id    : process.env.UIOWA_ACCESS_KEY_ID,
     client_secret: process.env.UIOWA_SECRET_ACCESS_KEY,
     code         : auth_code,
@@ -59,7 +59,6 @@ async function getAuthTokenFromCode(auth_code, request) {
 
   // Confirm with the handshake
   const token = oauth_uiowa.accessToken.create(result);
-  console.log('token callback from oauth: ', token);
 
   // Save token values to session
   saveTokenToSession(token, request);
