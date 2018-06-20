@@ -12,17 +12,17 @@
 /* Router dependencies ------------------------------------------------------*/
 const express   = require('express');
 var    router   = express.Router();
-var EventModel  = require('../models/event.model');
+var EventModel  = require('./event.model');
 
 // TESTING
 const validateParams = require('../utils/index').validateParams;
-const eventUtils = require('../utils/event.utils');
+const eventUtils = require('./event.utils');
+const authUtils = require('../auth/auth.utils');
 
 
 /* CRUD API -----------------------------------------------------------------*/
 // GET events -- List events
 router.get('/', 
-  //(request, response) => EventModel.listEvents(request, response));
   [EventModel.listEventsMiddleware],
   (request, response) => response.status(200).json(request.items)
 );
@@ -43,6 +43,7 @@ router.post('/',
     eventUtils.validParamTextField,
     eventUtils.validParamUserEmail,
     validateParams,
+    authUtils.checkSession,    
     EventModel.saveEventMiddleware
   ], 
   (request, response) => response.status(201).json({"message": "Success"})

@@ -3,11 +3,17 @@
 */
 
 var dynamo = require('dynamodb');
-var Joi    = require('Joi');
+var Joi    = require('joi');
 
-/**
-* Events Model
-*/
+
+// Utility to create our database name
+const createTableName = require('../utils/index').createTableName;
+const name            = process.env.APP_NAME;
+const env             = process.env.EENV;
+const table           = 'events';
+
+
+/** Events Model */
 var EventModel = dynamo.define('Event', {
   // Set primary key
   hashKey: 'id',
@@ -23,7 +29,7 @@ var EventModel = dynamo.define('Event', {
     approved: Joi.boolean().default(false)
   },
 
-  tableName: process.env.DYNAMO_TABLE
+  tableName: createTableName(name, env, table)
 });
 
 
