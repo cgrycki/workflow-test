@@ -15,10 +15,10 @@ const Room      = require('./room.model');
 
 
 /* Parameters? ---*/
-router.param('roomNumber', roomUtils.validRoomNum);
-router.param('date', roomUtils.validDate);
-router.param('startTime', roomUtils.validStartTime);
-router.param('endTime', roomUtils.validEndTime);
+router.param('roomNumber',  roomUtils.validRoomNum);
+router.param('date',        roomUtils.validDate);
+router.param('startTime',   roomUtils.validStartTime);
+router.param('endTime',     roomUtils.validEndTime);
 
 
 /* REST ---------------------------------------------------------------------*/
