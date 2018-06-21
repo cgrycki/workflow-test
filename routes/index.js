@@ -15,7 +15,8 @@ router.get('/', function(req, res, next) {
     res.redirect(authUtils.getAuthUrl());
   }*/
 
-  res.redirect('http://localhost:3000');
+  /*res.redirect('http://localhost:3000');*/
+  res.redirect(process.env.REDIRECT_URI);
 });
 
 module.exports = router;
