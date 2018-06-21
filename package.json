@@ -5,8 +5,8 @@
   "scripts": {
     "start": "nodemon ./bin/www",
     "predeploy": "claudia generate-serverless-express-proxy --express-module server",
-    "deploy": "npm run predeploy && TMPDIR=/tmp claudia create --handler lambda.handler --deploy-proxy-api --region us-east-1",
-    "update": "npm run predeploy && TMPDIR=/tmp claudia update"
+    "deploy": "npm run predeploy && TMPDIR=/tmp claudia create --handler lambda.handler --deploy-proxy-api --region us-east-1 --set-env-from-json",
+    "update": "npm run predeploy && TMPDIR=/tmp claudia update --set-env-from-json"
   },
   "dependencies": {
     "aws-sdk": "^2.255.1",
