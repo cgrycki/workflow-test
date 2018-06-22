@@ -1,10 +1,16 @@
-/**
-* DynamoDB Models
-*/
+// DynamoDB Events model
 
+/* DEPENDENCIES -------------------------------------------------------------*/
+// Set up Dynamo to connect, even in our Lambda env.
 var dynamo = require('dynamodb');
-var Joi    = require('joi');
+dynamo.AWS.config.update({
+  accessKeyId    : process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region         : process.env.AWS_REGION
+});
 
+// Database model validation
+var Joi    = require('joi');
 
 // Utility to create our database name
 const createTableName = require('../utils/index').createTableName;
@@ -13,7 +19,7 @@ const env             = process.env.EENV;
 const table           = 'events';
 
 
-/** Events Model */
+/* MODEL --------------------------------------------------------------------*/
 var EventModel = dynamo.define('Event', {
   // Set primary key
   hashKey: 'id',
@@ -33,6 +39,7 @@ var EventModel = dynamo.define('Event', {
 });
 
 
+/* RESTful functions --------------------------------------------------------*/
 /**
  * Checks to see if a document with a given :Id exists in our DB
  * @param {object} request Express HTTP request.
