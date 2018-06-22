@@ -39,7 +39,7 @@ app.use(validator());
 
 
 // Authentication check
-//app.use('/', require('./auth/auth.utils').requiresLogin);
+//app.use('*', require('./auth/auth.utils').requiresLogin);
 
 
 // Routes
@@ -47,7 +47,7 @@ var indexRouter = require('./routes/index');
 var eventRouter = require('./events/event.routes');
 var roomRouter  = require('./rooms/room.routes');
 
-app.use('/', indexRouter);
+//app.use('/', indexRouter);
 app.use('/events', eventRouter);
 app.use('/rooms', roomRouter);
 app.use('/auth', require('./auth/auth.routes'));
