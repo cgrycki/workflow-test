@@ -12,7 +12,7 @@
 /* Router dependencies ------------------------------------------------------*/
 const express   = require('express');
 var    router   = express.Router();
-var EventModel  = require('./event.model');
+var EventModel  = new require('./event.model');
 
 // TESTING
 const validateParams = require('../utils/index').validateParams;
@@ -23,7 +23,14 @@ const authUtils = require('../auth/auth.utils');
 /* CRUD API -----------------------------------------------------------------*/
 // GET events -- List events
 router.get('/', 
-  [EventModel.listEventsMiddleware],
+  [
+    (req, res, next) => {
+      console.log(req.headers);
+      console.log(EventModel);
+      next();
+    },
+    EventModel.listEventsMiddleware
+  ],
   (request, response) => response.status(200).json(request.items)
 );
 
