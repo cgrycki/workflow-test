@@ -30,7 +30,7 @@ app.use(cookieParser());
 app.use(bodyParser.json({ type: 'application/json' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 // User Sessions backed by DynamoDB
-app.use(session);
+//app.use(session);
 // API Parameter validation
 app.use(validator());
 
