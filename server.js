@@ -15,6 +15,22 @@ var session      = require('./auth/auth.session');
 var validator    = require('express-validator');
 var logger       = require('morgan');
 
+// Chris Testing //
+var AWS = require("aws-sdk");
+AWS.config.update({
+        region: process.env.AWS_DEFAULT_REGION
+    });
+var db = new AWS.DynamoDB();
+
+router.get('/table-list', function(req, res, next) {
+    db.listTables(function(err, data) {
+      console.log(data.TableNames);
+    });
+
+  res.send('AWS - See the console plz.');
+});
+///////////////////
+
 // Xray testing
 var AWSXRay = require('aws-xray-sdk');
 //var xrayExpress = require('aws-xray-sdk-express');
