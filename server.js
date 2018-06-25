@@ -21,14 +21,6 @@ AWS.config.update({
         region: process.env.AWS_DEFAULT_REGION
     });
 var db = new AWS.DynamoDB();
-
-router.get('/table-list', function(req, res, next) {
-    db.listTables(function(err, data) {
-      console.log(data.TableNames);
-    });
-
-  res.send('AWS - See the console plz.');
-});
 ///////////////////
 
 // Xray testing
