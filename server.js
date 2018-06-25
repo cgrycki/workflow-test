@@ -16,15 +16,15 @@ var validator    = require('express-validator');
 var logger       = require('morgan');
 
 // Xray testing
-var AWSXRay = require('aws-xray-sdk-core');
-var xrayExpress = require('aws-xray-sdk-express');
+var AWSXRay = require('aws-xray-sdk');
+//var xrayExpress = require('aws-xray-sdk-express');
 
 
 // App Instance
 var app = express();
 
 // Xray testing
-app.use(xrayExpress.openSegment('defaultName'));
+app.use(AWSXRay.express.openSegment('workflow-test'));
 
 /* Further App Configurations -----------------------------------------------*/
 // Security best practices
@@ -61,6 +61,6 @@ app.use('/auth', require('./auth/auth.routes'));
 
 
 // Xray testing
-app.use(xrayExpress.closeSegment());
+app.use(AWSXRay.express.closeSegment());
 
 module.exports = app;
