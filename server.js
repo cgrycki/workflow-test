@@ -15,9 +15,16 @@ var session      = require('./auth/auth.session');
 var validator    = require('express-validator');
 var logger       = require('morgan');
 
+// Xray testing
+var AWSXRay = require('aws-xray-sdk-core');
+var xrayExpress = require('aws-xray-sdk-express');
+
 
 // App Instance
 var app = express();
+
+// Xray testing
+app.use(xrayExpress.openSegment('defaultName'));
 
 /* Further App Configurations -----------------------------------------------*/
 // Security best practices
@@ -52,5 +59,8 @@ app.use('/events', eventRouter);
 app.use('/rooms', roomRouter);
 app.use('/auth', require('./auth/auth.routes'));
 
+
+// Xray testing
+app.use(xrayExpress.closeSegment());
 
 module.exports = app;
