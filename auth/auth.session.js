@@ -18,16 +18,16 @@ var DynamoDBStore = require('connect-dynamodb')({ session: session });
 const dynamo_options = { 
   table: createTableName(app_name, env_type, table),
   AWSConfigJSON: {
-    accessKeyId    : process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region         : process.env.AWS_REGION
+    accessKeyId    : process.env.MY_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY,
+    region         : process.env.MY_AWS_REGION
   }
 };
 const ONE_HOUR = 60 * 60 * 1000;
 
 module.exports = session({
   store: new DynamoDBStore(dynamo_options), 
-  secret: process.env.AWS_SECRET_ACCESS_KEY,
+  secret: process.env.MY_AWS_SECRET_ACCESS_KEY,
   resave: false, // change when we get a handle at a persisting login state
   saveUninitialized: false,
   cookie: {
