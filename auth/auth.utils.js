@@ -181,9 +181,9 @@ function retrieveSession(request, response, next) {
 }
 
 
-exports.validParamCode         = validParamCode;
-exports.getAuthURL             = getAuthURL;
-exports.clearTokensFromSession = clearTokensFromSession;
-exports.checkSession           = checkSession;
-exports.authenticateCode       = authenticateCode;
-exports.retrieveSession        = retrieveSession;
+module.exports.validParamCode         = validParamCode;
+module.exports.getAuthURL             = getAuthURL;
+module.exports.clearTokensFromSession = clearTokensFromSession;
+module.exports.checkSession           = checkSession;
+module.exports.authenticateCode       = authenticateCode;
+module.exports.retrieveSession        = retrieveSession;

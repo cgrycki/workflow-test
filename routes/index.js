@@ -1,5 +1,6 @@
 var express   = require('express');
 var router    = express.Router();
+var url       = require('url');
 var authUtils = require('../auth/auth.utils');
 
 /**
@@ -17,7 +18,10 @@ router.get('/', function(req, res) {
   if (accessToken) res.redirect(process.env.FRONTEND_URI);
   // Otherwise send them to auth. If the request contains a code it will
   // be validated by our auth route. If it doesn't it will send them to login
-  res.redirect('/auth');
+  res.redirect(url.format({
+    pathname:"/auth",
+    query: req.query,
+  }));
 });
 
 module.exports = router;
