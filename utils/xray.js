@@ -20,3 +20,5 @@ segment.addAnnotation("AWS_REGION", process.env.AWS_REGION);
 
 // Make sure to close the xray after the routes are done!
 // app.use(xrayAWS.express.closeSegment());
+
+module.exports = xray;
