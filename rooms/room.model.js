@@ -11,11 +11,14 @@
  * Align rooms reservable status with kelly
  */
 
-// Load up our env
-require('dotenv').config();
+/* DEPENDENCIES -------------------------------------------------------------*/
+// Set up Dynamo to connect, even in our Lambda env.
+var dynamo = require('dynamodb');
+dynamo.AWS.config.update({
+  region         : process.env.AWS_DEFAULT_REGION
+});
 
-// AWS database + model validation
-const dynamo = require('dynamodb');
+// Database model validation
 const Joi    = require('joi');
 
 // Utility to create our database name
@@ -24,7 +27,8 @@ const name            = process.env.APP_NAME;
 const env             = process.env.EENV;
 const table           = 'rooms';
 
-// DynamoDB model
+
+/* MODEL --------------------------------------------------------------------*/
 var Room = dynamo.define('Room', {
   hashKey: 'roomNumber',
   schema: {
@@ -56,7 +60,7 @@ Room.getRooms = function(request, response) {
     .scan()
     .attributes(['roomNumber', 'floor'])
     .exec((err, data) => {
-      if (err) reponse.send(404).json(err);
+      if (err) response.send(404).json(err);
       else response.status(200).json(data.Items);
     });
 }
@@ -73,8 +77,6 @@ Room.getRoom = function(request, response) {
       else response.status(200).json(data.Items);
     });
 }
-
-
 
 
 module.exports = Room;
