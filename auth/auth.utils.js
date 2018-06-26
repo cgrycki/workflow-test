@@ -84,15 +84,15 @@ function saveTokenToSession(token, request) {
   let sess = request.session;
 
   // Save the access token to session
-  sess.uiowa_access_token = token.token.access_token;
+  sess.uiowa_access_token = token.access_token;
   // Save refresh token
-  sess.uiowa_refresh_token = token.token.refresh_token;
+  sess.uiowa_refresh_token = token.refresh_token;
   // Save the expiration time
-  sess.expires_in = token.token.expires_in;
+  sess.expires_in = token.expires_in;
   // Save alphanumeric HawkID
-  sess.hawkID = token.token.params.hawkID;
+  sess.hawkID = token.params.hawkID;
   // Save University ID interger
-  sess.uid = token.token.params.uid;
+  sess.uid = token.params.uid;
 }
 
 

@@ -28,7 +28,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session);           // User Sessions backed by DynamoDB
 app.use(validator());       // API Parameter validation
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV) {
   // Only use Xray in production environment
   var xray = require('./utils/xray');
   app.use(xray.startTrace);
@@ -49,7 +49,7 @@ app.use('/events', eventRouter);
 app.use('/rooms', roomRouter);
 app.use('/auth', require('./auth/auth.routes'));
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV) {
   app.use(xray.endTrace); // Close Xray
 }
 

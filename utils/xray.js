@@ -20,6 +20,8 @@ const requestTrace = (request, response, next) => {
       subsegment.addAnnotation("AWS_SECRET_ACCESS_KEY", `${process.env.AWS_SECRET_ACCESS_KEY}`);
       subsegment.addAnnotation("AWS_SESSION_TOKEN", `${process.env.AWS_SESSION_TOKEN}`);
       subsegment.addAnnotation("AWS_REGION", `${process.env.AWS_REGION}`);
+      subsegment.addAnnotation("REQUEST_COOKIES", JSON.stringify(request.cookies));
+      subsegment.addAnnotation("REQUEST_SESSION", JSON.stringify(request.session));
       subsegment.close();
   });
   next();
