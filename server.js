@@ -41,6 +41,7 @@ app.use(session);
 // API Parameter validation
 app.use(validator());
 
+/*
 var segment = req.segment;
 segment.addAnnotation("AWS_ACCESS_KEY_ID", process.env.AWS_ACCESS_KEY_ID);
 segment.addAnnotation("AWS_ACCESS_KEY", process.env.AWS_ACCESS_KEY);
@@ -49,7 +50,14 @@ segment.addAnnotation("AWS_SECRET_ACCESS_KEY", process.env.AWS_SECRET_ACCESS_KEY
 segment.addAnnotation("AWS_SESSION_TOKEN", process.env.AWS_SESSION_TOKEN);
 segment.addAnnotation("AWS_SECURITY_TOKEN", process.env.AWS_SECURITY_TOKEN);
 segment.addAnnotation("AWS_REGION", process.env.AWS_REGION);
+*/
 
+const requestTrace = (request, response, next) => {
+    console.log('Request trace: ', request);
+    console.log('Process env: ', process.env);
+    next();
+};
+app.use(requestTrace);
 // Authentication check
 //app.use('*', require('./auth/auth.utils').requiresLogin);
 
