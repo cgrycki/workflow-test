@@ -54,19 +54,16 @@ async function getAuthTokenFromCode(auth_code, request) {
     client_id    : process.env.UIOWA_ACCESS_KEY_ID,
     client_secret: process.env.UIOWA_SECRET_ACCESS_KEY,
     code         : auth_code,
-    redirect_uri : process.env.REDIRECT_URI
+    redirect_uri : process.env.REDIRECT_URI + '/auth'
   });
 
   // Confirm with the handshake
   const token = oauth_uiowa.accessToken.create(result);
 
   // Save token values to session
-  try {
-    saveTokenToSession(token, request);
-    return token;
-  } catch (error) {
-    return token;
-  };
+  //saveTokenToSession(token, request);
+
+  return token;
 }
 
 
@@ -159,10 +156,18 @@ async function authenticateCode(request, response, next) {
       token = await getAuthTokenFromCode(code, request);
 
       // Token checks out, values are saved. Send them to fill form on client.
-      return next();
+      //return next();
+      return response.status(200).json({ 
+        token: token,
+        code: code 
+      });
     } catch (error) {
       console.error(error, error.stack);
-      response.status(500).json({ error: error , stack: error.stack });
+      response.status(500).json({ 
+        error: error, 
+        stack: error.stack,
+        token: token 
+      });
     }
   } else {
     // Who in the world sent this if we didn't have a code?
