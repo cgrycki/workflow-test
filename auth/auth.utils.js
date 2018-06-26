@@ -64,7 +64,7 @@ async function getAuthTokenFromCode(auth_code, request) {
   try {
     saveTokenToSession(token, request);
     return token;
-  } catch {
+  } catch (error) {
     return token;
   };
 }
