@@ -55,14 +55,16 @@ segment.addAnnotation("AWS_REGION", process.env.AWS_REGION);
 const requestTrace = (request, response, next) => {
     console.log('Request trace: ', request);
     console.log('Process env: ', process.env);
-    var segment = request.segment;
-    segment.addAnnotation("AWS_ACCESS_KEY_ID", process.env.AWS_ACCESS_KEY_ID);
-    segment.addAnnotation("AWS_ACCESS_KEY", process.env.AWS_ACCESS_KEY);
-    segment.addAnnotation("AWS_SECRET_KEY", process.env.AWS_SECRET_KEY);
-    segment.addAnnotation("AWS_SECRET_ACCESS_KEY", process.env.AWS_SECRET_ACCESS_KEY);
-    segment.addAnnotation("AWS_SESSION_TOKEN", process.env.AWS_SESSION_TOKEN);
-    segment.addAnnotation("AWS_SECURITY_TOKEN", process.env.AWS_SECURITY_TOKEN);
-    segment.addAnnotation("AWS_REGION", process.env.AWS_REGION);
+    AWSXRay.captureAsyncFunc('send', function(subsegment) {
+        subsegment.addAnnotation("AWS_ACCESS_KEY_ID", process.env.AWS_ACCESS_KEY_ID);
+        subsegment.addAnnotation("AWS_ACCESS_KEY", process.env.AWS_ACCESS_KEY);
+        subsegment.addAnnotation("AWS_SECRET_KEY", process.env.AWS_SECRET_KEY);
+        subsegment.addAnnotation("AWS_SECRET_ACCESS_KEY", process.env.AWS_SECRET_ACCESS_KEY);
+        subsegment.addAnnotation("AWS_SESSION_TOKEN", process.env.AWS_SESSION_TOKEN);
+        subsegment.addAnnotation("AWS_SECURITY_TOKEN", process.env.AWS_SECURITY_TOKEN);
+        subsegment.addAnnotation("AWS_REGION", process.env.AWS_REGION);
+        subseg,ent.close();
+    });
     next();
 };
 app.use(requestTrace);
