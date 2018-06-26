@@ -61,9 +61,11 @@ async function getAuthTokenFromCode(auth_code, request) {
   const token = oauth_uiowa.accessToken.create(result);
 
   // Save token values to session
-  saveTokenToSession(token, request);
-
-  return token;
+  try {
+    saveTokenToSession(token, request);
+    return token;
+  } catch (error) {
+    return token;
 }
 
 
