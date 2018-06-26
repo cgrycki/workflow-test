@@ -25,11 +25,11 @@ const authUtils = require('../auth/auth.utils');
 router.get('/', 
   [
     (req, res, next) => {
-      console.log(req.headers);
-      console.log(EventModel);
+      // Take a look at our sessions once authentication is working
+      console.log(req.session);
       next();
-    },
-    EventModel.listEventsMiddleware
+    }
+    ,EventModel.listEventsMiddleware
   ],
   (request, response) => response.status(200).json(request.items)
 );
@@ -50,7 +50,7 @@ router.post('/',
     eventUtils.validParamTextField,
     eventUtils.validParamUserEmail,
     validateParams,
-    authUtils.checkSession,    
+    //authUtils.checkSession,    
     EventModel.saveEventMiddleware
   ], 
   (request, response) => response.status(201).json({"message": "Success"})
