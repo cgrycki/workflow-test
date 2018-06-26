@@ -20,7 +20,7 @@ router.get('/', function(req, res) {
   // be validated by our auth route. If it doesn't it will send them to login
   res.redirect(url.format({
     pathname:"/auth",
-    query: req.query,
+    query: req.query
   }));
 });
 
