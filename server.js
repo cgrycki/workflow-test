@@ -31,17 +31,10 @@ app.use(validator());       // API Parameter validation
 if (process.env.NODE_ENV === 'production') {
   // Only use Xray in production environment
   var xray = require('./utils/xray');
-  var xrayAWS = require('aws-xray-sdk');
-  app.use(xray);
+  app.use(xray.startTrace);
+  app.use(xray.requestTrace);
 }
 
-// Ghetto AWS Xray
-const requestTrace = (request, response, next) => {
-  console.log('Request trace: ', request);
-  console.log('Process env: ', process.env);
-  next();
-};
-//app.use(requestTrace);
 
 // Authentication check
 //app.use('*', require('./auth/auth.utils').requiresLogin);
@@ -57,8 +50,7 @@ app.use('/rooms', roomRouter);
 app.use('/auth', require('./auth/auth.routes'));
 
 if (process.env.NODE_ENV === 'production') {
-  // Close Xray
-  app.use(xrayAWS.express.closeSegment());
+  app.use(xray.endTrace); // Close Xray
 }
 
 

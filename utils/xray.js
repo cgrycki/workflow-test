@@ -6,19 +6,29 @@
 var xrayAWS = require('aws-xray-sdk');
 var xrayExpress = require('aws-xray-sdk-express');
 
-// App uses this
-var xray = xrayAWS.express.openSegment(process.env.APP_NAME);
+// App Name
+var app_name = 'workflow-test' || process.env.APP_NAME +'-'+ process.env.EENV;
 
-var segment = req.segment;
-segment.addAnnotation("AWS_ACCESS_KEY_ID", process.env.AWS_ACCESS_KEY_ID);
-segment.addAnnotation("AWS_ACCESS_KEY", process.env.AWS_ACCESS_KEY);
-segment.addAnnotation("AWS_SECRET_KEY", process.env.AWS_SECRET_KEY);
-segment.addAnnotation("AWS_SECRET_ACCESS_KEY", process.env.AWS_SECRET_ACCESS_KEY);
-segment.addAnnotation("AWS_SESSION_TOKEN", process.env.AWS_SESSION_TOKEN);
-segment.addAnnotation("AWS_SECURITY_TOKEN", process.env.AWS_SECURITY_TOKEN);
-segment.addAnnotation("AWS_REGION", process.env.AWS_REGION);
+// Used as middleware before the routes are assigned.
+var startTrace = xrayAWS.express.openSegment(app_name);
+
+const requestTrace = (request, response, next) => {
+  console.log('Request trace: ', request);
+  console.log('Process env: ', process.env);
+  xrayAWS.captureAsyncFunc('send', function(subsegment) {
+      subsegment.addAnnotation("AWS_ACCESS_KEY_ID", `${process.env.AWS_ACCESS_KEY_ID}`);
+      subsegment.addAnnotation("AWS_SECRET_ACCESS_KEY", `${process.env.AWS_SECRET_ACCESS_KEY}`);
+      subsegment.addAnnotation("AWS_SESSION_TOKEN", `${process.env.AWS_SESSION_TOKEN}`);
+      subsegment.addAnnotation("AWS_REGION", `${process.env.AWS_REGION}`);
+      subsegment.close();
+  });
+  next();
+};
 
 // Make sure to close the xray after the routes are done!
 // app.use(xrayAWS.express.closeSegment());
+const endTrace = xrayAWS.express.closeSegment();
 
-module.exports = xray;
+exports.startTrace = startTrace;
+exports.requestTrace = requestTrace;
+exports.endTrace = endTrace;
