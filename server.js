@@ -41,14 +41,14 @@ app.use(session);
 // API Parameter validation
 app.use(validator());
 
-var document = AWSXRay.getSegment();
-document.addAnnotation("AWS_ACCESS_KEY_ID", process.env.AWS_ACCESS_KEY_ID);
-document.addAnnotation("AWS_ACCESS_KEY", process.env.AWS_ACCESS_KEY);
-document.addAnnotation("AWS_SECRET_KEY", process.env.AWS_SECRET_KEY);
-document.addAnnotation("AWS_SECRET_ACCESS_KEY", process.env.AWS_SECRET_ACCESS_KEY);
-document.addAnnotation("AWS_SESSION_TOKEN", process.env.AWS_SESSION_TOKEN);
-document.addAnnotation("AWS_SECURITY_TOKEN", process.env.AWS_SECURITY_TOKEN);
-document.addAnnotation("AWS_REGION", process.env.AWS_REGION);
+var subsegment = new Subsegment('workflow-test-sub');
+subsegment.addAnnotation("AWS_ACCESS_KEY_ID", process.env.AWS_ACCESS_KEY_ID);
+subsegment.addAnnotation("AWS_ACCESS_KEY", process.env.AWS_ACCESS_KEY);
+subsegment.addAnnotation("AWS_SECRET_KEY", process.env.AWS_SECRET_KEY);
+subsegment.addAnnotation("AWS_SECRET_ACCESS_KEY", process.env.AWS_SECRET_ACCESS_KEY);
+subsegment.addAnnotation("AWS_SESSION_TOKEN", process.env.AWS_SESSION_TOKEN);
+subsegment.addAnnotation("AWS_SECURITY_TOKEN", process.env.AWS_SECURITY_TOKEN);
+subsegment.addAnnotation("AWS_REGION", process.env.AWS_REGION);
 
 // Authentication check
 //app.use('*', require('./auth/auth.utils').requiresLogin);
