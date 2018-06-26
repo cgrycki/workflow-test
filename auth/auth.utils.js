@@ -172,10 +172,10 @@ function retrieveSession(request, response, next) {
   let sess = request.session;
   // Set all the info needed by later middleware in /events.
   // We need user access (oauth) token to create/update workflow package
-  sess.USER_ACCESS_TOKEN = sess.uiowa_access_token;
+  request.uiowa_access_token = sess.uiowa_access_token;
 
   // We need the user's IP address to create/update workflow package
-  sess.USER_IP_ADDRESS = request.ip || '0.0.0.0';
+  request.USER_IP_ADDRESS = request.ip || '0.0.0.0';
 
   next();
 }
