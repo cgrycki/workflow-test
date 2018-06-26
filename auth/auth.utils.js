@@ -54,7 +54,7 @@ async function getAuthTokenFromCode(auth_code, request) {
     client_id    : process.env.UIOWA_ACCESS_KEY_ID,
     client_secret: process.env.UIOWA_SECRET_ACCESS_KEY,
     code         : auth_code,
-    redirect_uri : process.env.REDIRECT_URI + '/auth'
+    redirect_uri : process.env.REDIRECT_URI
   });
 
   // Confirm with the handshake
