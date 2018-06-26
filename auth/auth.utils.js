@@ -159,7 +159,7 @@ async function authenticateCode(request, response, next) {
       return next();
     } catch (error) {
       console.error(error, error.stack);
-      response.status(500).json({ error: error });
+      response.status(500).json({ error: error , stack: error.stack });
     }
   } else {
     // Who in the world sent this if we didn't have a code?
