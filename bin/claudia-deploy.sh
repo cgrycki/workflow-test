@@ -8,8 +8,7 @@
 JSON=$1
 ROLE=$2
 
-
-
+# Make sure both arguments are present before executing.
 if [ -n "$JSON" ] && [[ -n "$ROLE" ]]; then
     TMPDIR=/tmp claudia create\
      --handler lambda.handler \
@@ -20,3 +19,4 @@ if [ -n "$JSON" ] && [[ -n "$ROLE" ]]; then
 else
     echo "argument error"
 fi
+
