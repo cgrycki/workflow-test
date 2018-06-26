@@ -1,6 +1,6 @@
 /**
- * Express Server
- */
+* Express Server
+*/
 
 // Environment variables
 require('dotenv').config();
@@ -15,75 +15,43 @@ var session      = require('./auth/auth.session');
 var validator    = require('express-validator');
 var logger       = require('morgan');
 
-// Xray testing
-var AWSXRay = require('aws-xray-sdk');
-//var xrayExpress = require('aws-xray-sdk-express');
-
 
 // App Instance
 var app = express();
 
-// Xray testing
-app.use(AWSXRay.express.openSegment('workflow-test'));
-
 /* Further App Configurations -----------------------------------------------*/
-// Security best practices
-app.use(helmet());
-// Logging
-app.use(logger('dev'));
-// And cookies
-app.use(cookieParser());
-// For JSON headers
-app.use(bodyParser.json({ type: 'application/json' }));
+app.use(helmet());          // Security best practices
+app.use(logger('dev'));     // Logging
+app.use(cookieParser());    // And cookies
+app.use(bodyParser.json({ type: 'application/json' })); // For JSON headers
 app.use(bodyParser.urlencoded({ extended: true }));
-// User Sessions backed by DynamoDB
-app.use(session);
-// API Parameter validation
-app.use(validator());
+app.use(session);           // User Sessions backed by DynamoDB
+app.use(validator());       // API Parameter validation
 
-/*
-var segment = req.segment;
-segment.addAnnotation("AWS_ACCESS_KEY_ID", process.env.AWS_ACCESS_KEY_ID);
-segment.addAnnotation("AWS_ACCESS_KEY", process.env.AWS_ACCESS_KEY);
-segment.addAnnotation("AWS_SECRET_KEY", process.env.AWS_SECRET_KEY);
-segment.addAnnotation("AWS_SECRET_ACCESS_KEY", process.env.AWS_SECRET_ACCESS_KEY);
-segment.addAnnotation("AWS_SESSION_TOKEN", process.env.AWS_SESSION_TOKEN);
-segment.addAnnotation("AWS_SECURITY_TOKEN", process.env.AWS_SECURITY_TOKEN);
-segment.addAnnotation("AWS_REGION", process.env.AWS_REGION);
-*/
+if (process.env.NODE_ENV === 'production') {
+  // Only use Xray in production environment
+  var xray = require('./utils/xray');
+  app.use(xray.startTrace);
+  app.use(xray.requestTrace);
+}
 
-const requestTrace = (request, response, next) => {
-    console.log('Request trace: ', request);
-    console.log('Process env: ', process.env);
-    AWSXRay.captureAsyncFunc('send', function(subsegment) {
-        subsegment.addAnnotation("AWS_ACCESS_KEY_ID", `${process.env.AWS_ACCESS_KEY_ID}`);
-        subsegment.addAnnotation("AWS_ACCESS_KEY", `${process.env.AWS_ACCESS_KEY}`);
-        subsegment.addAnnotation("AWS_SECRET_KEY", `${process.env.AWS_SECRET_KEY}`);
-        subsegment.addAnnotation("AWS_SECRET_ACCESS_KEY", `${process.env.AWS_SECRET_ACCESS_KEY}`);
-        subsegment.addAnnotation("AWS_SESSION_TOKEN", `${process.env.AWS_SESSION_TOKEN}`);
-        subsegment.addAnnotation("AWS_SECURITY_TOKEN", `${process.env.AWS_SECURITY_TOKEN}`);
-        subsegment.addAnnotation("AWS_REGION", `${process.env.AWS_REGION}`);
-        subsegment.close();
-    });
-    next();
-};
-app.use(requestTrace);
+
 // Authentication check
 //app.use('*', require('./auth/auth.utils').requiresLogin);
-
 
 // Routes
 var indexRouter = require('./routes/index');
 var eventRouter = require('./events/event.routes');
 var roomRouter  = require('./rooms/room.routes');
 
-//app.use('/', indexRouter);
+app.use('/', indexRouter);
 app.use('/events', eventRouter);
 app.use('/rooms', roomRouter);
 app.use('/auth', require('./auth/auth.routes'));
 
+if (process.env.NODE_ENV === 'production') {
+  app.use(xray.endTrace); // Close Xray
+}
 
-// Xray testing
-app.use(AWSXRay.express.closeSegment());
 
 module.exports = app;

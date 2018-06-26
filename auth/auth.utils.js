@@ -175,7 +175,7 @@ function retrieveSession(request, response, next) {
   sess.USER_ACCESS_TOKEN = sess.uiowa_access_token;
 
   // We need the user's IP address to create/update workflow package
-  sess.USER_IP_ADDRESS = request.ip_address || '0.0.0.0';
+  sess.USER_IP_ADDRESS = request.ip || '0.0.0.0';
 
   next();
 }

@@ -12,14 +12,17 @@ const utils          = require('./auth.utils');
 router.param('code', utils.validParamCode);
 
 /* RESTful endpoints -------*/
-// GET should be authentication callback endpoint
-router.get('/', 
+// GET /auth -- Redirects to our login URL
+router.get('/', (req, resp) => resp.redirect(utils.getAuthURL()));
+
+// GET /auth/:code -- Authenticates code sent from Campus Login tools
+router.get('/:code', 
   [ validateParams, utils.authenticateCode ],
-  (request, response) => response.status(200).redirect('http://localhost:3000'));
+  (request, response) => response.status(200).redirect(process.env.FRONTEND_URI));
 
 // GET /auth/logout -- Ends a user's session and redirects them to the login URL.
 router.get('/logout', utils.clearTokensFromSession, (request, response) => { 
-  response.status(200).redirect('http://localhost:3001');
+  response.status(200).redirect(process.env.REDIRECT_URI);
 });
 
 
