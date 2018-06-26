@@ -17,7 +17,7 @@ router.param('code', utils.validParamCode);
 
 // GET /auth/:code -- Authenticates code sent from Campus Login tools
 //   [ validateParams, utils.authenticateCode ],
-router.get('/', await utils.authenticateCode, 
+router.get('/', [await utils.authenticateCode], 
   (request, response) => response.status(200).redirect(process.env.FRONTEND_URI));
 
 // GET /auth/logout -- Ends a user's session and redirects them to the login URL.
