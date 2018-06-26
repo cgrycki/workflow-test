@@ -10,7 +10,7 @@ var authUtils = require('../auth/auth.utils');
  */
 router.get('/', function(req, res) {
   // Gather authentication information
-  const accessToken = req.cookies.uiowa_access_token;
+  const accessToken = req.session.uiowa_access_token;
   const code = req.params.code;
 
   // If the user has an access token, we've already authenticated them

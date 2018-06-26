@@ -145,7 +145,7 @@ function checkSession(request, response, next) {
 
 // Authentication handshake with the U. Iowa servers
 async function authenticateCode(request, response, next) {
-  const code = request.params.code;
+  const code = request.query.code;
   if (code) {
     // We 'know' that the request came from a whitelisted domain
     // So use the authentication code to obtain an OAuth2 token
