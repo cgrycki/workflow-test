@@ -41,7 +41,7 @@ app.use(session);
 // API Parameter validation
 app.use(validator());
 
-var document = AWSXRay.getSegment('workflow-test');
+var document = AWSXRay.getSegment();
 document.addAnnotation("AWS_ACCESS_KEY_ID", process.env.AWS_ACCESS_KEY_ID);
 document.addAnnotation("AWS_ACCESS_KEY", process.env.AWS_ACCESS_KEY);
 document.addAnnotation("AWS_SECRET_KEY", process.env.AWS_SECRET_KEY);
