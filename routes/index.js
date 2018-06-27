@@ -15,7 +15,7 @@ router.get('/', function(req, res) {
   const code = req.params.code;
 
   // If the user has an access token, we've already authenticated them
-  if (accessToken) res.redirect(process.env.FRONTEND_URI);
+  if (accessToken) res.status(302).redirect(process.env.FRONTEND_URI);
   // Otherwise send them to auth. If the request contains a code it will
   // be validated by our auth route. If it doesn't it will send them to login
   res.redirect(url.format({

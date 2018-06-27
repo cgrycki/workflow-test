@@ -156,12 +156,12 @@ async function authenticateCode(request, response, next) {
       token = await getAuthTokenFromCode(code, request);
 
       // Token checks out, values are saved. Send them to fill form on client.
-      //return next();
-      return response.status(200).json({
+      return next();
+      /*return response.status(200).json({
         token: token,
         session: request.session,
         cookies: request.cookies
-      });
+      });*/
     } catch (error) {
       console.error(error, error.stack);
       response.status(500).json({ 
