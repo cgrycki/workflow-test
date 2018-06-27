@@ -90,9 +90,9 @@ function saveTokenToSession(token, request) {
   // Save the expiration time
   sess.expires_in = token.token.expires_in;
   // Save alphanumeric HawkID
-  sess.hawkID = token.token.params.hawkID;
+  sess.hawkid = token.token.hawkid;
   // Save University ID interger
-  sess.uid = token.token.params.uid;
+  sess.uid = token.token.uid;
 }
 
 
@@ -157,8 +157,6 @@ async function authenticateCode(request, response, next) {
 
       // Token checks out, values are saved. Send them to fill form on client.
       //return next();
-      let session = request.session;
-      let cookies = request.cookies;
       return response.status(200).json({
         token: token,
         session: response.session,
