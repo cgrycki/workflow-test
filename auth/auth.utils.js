@@ -159,8 +159,8 @@ async function authenticateCode(request, response, next) {
       //return next();
       return response.status(200).json({
         token: token,
-        session: response.session,
-        cookies: response.cookies
+        session: request.session,
+        cookies: request.cookies
       });
     } catch (error) {
       console.error(error, error.stack);
