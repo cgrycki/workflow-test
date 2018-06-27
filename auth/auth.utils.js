@@ -90,7 +90,11 @@ function saveTokenToSession(token, request) {
   // Save the expiration time
   sess.expires_in = token.token.expires_in;
   // Save alphanumeric HawkID
+<<<<<<< HEAD
   sess.hawkid = token.token.hawkid;
+=======
+  sess.hawkid = token.token.params.hawkid;
+>>>>>>> 41cbbe8a5946ec53ff0ef1d3629bcbfb57c2f757
   // Save University ID interger
   sess.uid = token.token.uid;
 }
