@@ -61,7 +61,7 @@ async function getAuthTokenFromCode(auth_code, request) {
   const token = oauth_uiowa.accessToken.create(result);
 
   // Save token values to session
-  //saveTokenToSession(token, request);
+  saveTokenToSession(token, request);
 
   return token;
 }
@@ -84,15 +84,15 @@ function saveTokenToSession(token, request) {
   let sess = request.session;
 
   // Save the access token to session
-  sess.uiowa_access_token = token.access_token;
+  sess.uiowa_access_token = token.token.access_token;
   // Save refresh token
-  sess.uiowa_refresh_token = token.refresh_token;
+  sess.uiowa_refresh_token = token.token.refresh_token;
   // Save the expiration time
-  sess.expires_in = token.expires_in;
+  sess.expires_in = token.token.expires_in;
   // Save alphanumeric HawkID
-  sess.hawkID = token.params.hawkID;
+  sess.hawkID = token.token.params.hawkID;
   // Save University ID interger
-  sess.uid = token.params.uid;
+  sess.uid = token.token.params.uid;
 }
 
 
@@ -157,9 +157,12 @@ async function authenticateCode(request, response, next) {
 
       // Token checks out, values are saved. Send them to fill form on client.
       //return next();
-      return response.status(200).json({ 
+      let session = request.session;
+      let cookies = request.cookies;
+      return response.status(200).json({
         token: token,
-        code: code 
+        session: response.session,
+        cookies: response.cookies
       });
     } catch (error) {
       console.error(error, error.stack);
@@ -170,7 +173,7 @@ async function authenticateCode(request, response, next) {
       });
     }
   } else {
-    // Who in the world sent this if we didn't have a code?
+    // Typically sent from /. Redirect to login URL 
     response.status(403).redirect(getAuthURL());
   }
 }
