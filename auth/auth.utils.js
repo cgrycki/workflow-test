@@ -90,13 +90,9 @@ function saveTokenToSession(token, request) {
   // Save the expiration time
   sess.expires_in = token.token.expires_in;
   // Save alphanumeric HawkID
-<<<<<<< HEAD
-  sess.hawkid = token.token.hawkid;
-=======
-  sess.hawkid = token.token.params.hawkid;
->>>>>>> 41cbbe8a5946ec53ff0ef1d3629bcbfb57c2f757
+  //sess.hawkid = token.token.hawkid;
   // Save University ID interger
-  sess.uid = token.token.uid;
+  //sess.uid = token.token.uid;
 }
 
 
@@ -109,7 +105,7 @@ function clearTokensFromSession(request, response, next) {
   // Clear the data
   sess.uiowa_access_token = undefined;
   sess.uiowa_refresh_token = undefined;
-  sess.hawkID = undefined;
+  sess.hawkid = undefined;
   sess.uid = undefined;
 
   // Double clear the data
