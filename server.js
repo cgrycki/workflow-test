@@ -28,7 +28,7 @@ app.use(cors({
 }));                        // Cross origin resource sharing, so we can talk to our frontend
 app.options('*', cors());   // Pre-flight CORS
 app.use(logger('dev'));     // Logging
-app.use(cookieParser());    // And cookies
+//app.use(cookieParser(process.env.MY_AWS_SECRET_ACCESS_KEY)); // And parse our cookies
 app.use(bodyParser.json({ type: 'application/json' })); // For JSON headers
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session);           // User Sessions backed by DynamoDB

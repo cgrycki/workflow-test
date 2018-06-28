@@ -182,7 +182,7 @@ function retrieveSession(request, response, next) {
 // Clears a user's session from the database on logout/timeout
 function clearTokensFromSession(request, response, next) {
   if (request.session && request.session.uiowa_access_token) {
-    request.session.reset();
+    request.session.destroy();
   }
   next();
 }
