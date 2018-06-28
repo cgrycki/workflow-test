@@ -52,7 +52,7 @@ router.post('/',
     "token": request.uiowa_access_token,
     "ip": request.ip,
     "body": request.body,
-    "req": request
+    "headers": request.headers
   })
 );
 
