@@ -23,6 +23,7 @@ var app = express();
 /* Further App Configurations -----------------------------------------------*/
 app.use(helmet());          // Security best practices
 app.use(cors());            // Cross origin resource sharing, so we can talk to our frontend
+app.options('*', cors());   // Pre-flight CORS
 app.use(logger('dev'));     // Logging
 app.use(cookieParser());    // And cookies
 app.use(bodyParser.json({ type: 'application/json' })); // For JSON headers
