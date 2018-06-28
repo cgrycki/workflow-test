@@ -49,7 +49,7 @@ router.post('/',
   ], 
   (request, response) => response.status(201).json({
     "message": "Success",
-    "token": request.uiowa_access_token,
+    "token": request.session.uiowa_access_token,
     "session": request.session,
     "cookies": request.cookies,
     "ip": request.user_ip_address,
