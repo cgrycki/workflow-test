@@ -33,6 +33,7 @@ app.use(bodyParser.json({ type: 'application/json' })); // For JSON headers
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session);           // User Sessions backed by DynamoDB
 app.use(validator());       // API Parameter validation
+app.set('trust proxy', 1); 
 
 if (process.env.NODE_ENV) {
   // Only use Xray in production environment
