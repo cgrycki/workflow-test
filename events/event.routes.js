@@ -50,6 +50,8 @@ router.post('/',
   (request, response) => response.status(201).json({
     "message": "Success",
     "token": request.uiowa_access_token,
+    "session": request.session,
+    "cookies": request.cookies,
     "ip": request.user_ip_address,
     "body": request.body,
     "headers": request.headers
