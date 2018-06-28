@@ -11,6 +11,7 @@ var authUtils = require('../auth/auth.utils');
  */
 router.get('/', function(req, res) {
   // Gather authentication information
+  req.session.reload();
   const accessToken = req.session.uiowa_access_token;
   const code = req.params.code;
 

@@ -164,7 +164,7 @@ function retrieveSession(request, response, next) {
   // Define and load the session
   let sess = request.session;
   sess.reload();
-  
+
   // Set all the info needed by later middleware in /events.
   // We need user access (oauth) token to create/update workflow package
   request.uiowa_access_token = sess.uiowa_access_token;
@@ -181,18 +181,9 @@ function retrieveSession(request, response, next) {
 
 // Clears a user's session from the database on logout/timeout
 function clearTokensFromSession(request, response, next) {
-  let sess = request.session;
-
-  // Clear the data
-  //sess.uiowa_access_token = undefined;
-  //sess.uiowa_refresh_token = undefined;
-  //sess.hawkid = undefined;
-  //sess.uid = undefined;
-
-  // Double clear the data
-  sess.destroy();
-
-  // Route back to our login URL in our final callback
+  if (request.session && request.session.uiowa_access_token) {
+    request.session.reset();
+  }
   next();
 }
 
