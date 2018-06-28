@@ -33,5 +33,6 @@ module.exports = session({
   cookie: {
     maxAge: ONE_HOUR,
     secure: true
-  }
+  },
+  proxy: true
 });
