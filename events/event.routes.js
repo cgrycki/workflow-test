@@ -45,12 +45,12 @@ router.post('/',
     validateParams,
     //authUtils.checkSession,
     authUtils.retrieveSession,  
-    EventModel.saveEventMiddleware
+    //EventModel.saveEventMiddleware
   ], 
   (request, response) => response.status(201).json({
     "message": "Success",
     "token": request.uiowa_access_token,
-    "ip": request.ip,
+    "ip": request.user_ip_address,
     "body": request.body,
     "headers": request.headers
   })
