@@ -32,7 +32,6 @@ module.exports = session({
   saveUninitialized: false,
   cookie: {
     maxAge: ONE_HOUR,
-    secure: true,
-    httpOnly: true
+    secure: true
   }
 });
