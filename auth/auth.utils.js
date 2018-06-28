@@ -82,7 +82,7 @@ function saveTokenToSession(token, request) {
     }
   }*/
   let sess = request.session;
-
+  
   // Save the access token to session
   sess.uiowa_access_token = token.token.access_token;
   // Save refresh token
@@ -161,7 +161,10 @@ function checkSession(request, response, next) {
 
 // Middelware refreshing a session auth, and passing the user details for /events
 function retrieveSession(request, response, next) {
+  // Define and load the session
   let sess = request.session;
+  sess.reload();
+  
   // Set all the info needed by later middleware in /events.
   // We need user access (oauth) token to create/update workflow package
   request.uiowa_access_token = sess.uiowa_access_token;

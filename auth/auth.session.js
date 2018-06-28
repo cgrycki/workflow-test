@@ -31,6 +31,8 @@ module.exports = session({
   resave: false, // change when we get a handle at a persisting login state
   saveUninitialized: false,
   cookie: {
-    maxAge: ONE_HOUR
+    maxAge: ONE_HOUR,
+    secure: true,
+    httpOnly: true
   }
 });
