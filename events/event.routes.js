@@ -23,14 +23,7 @@ const authUtils = require('../auth/auth.utils');
 /* CRUD API -----------------------------------------------------------------*/
 // GET events -- List events
 router.get('/', 
-  [
-    (req, res, next) => {
-      // Take a look at our sessions once authentication is working
-      console.log(req.session);
-      next();
-    }
-    ,EventModel.listEventsMiddleware
-  ],
+  EventModel.listEventsMiddleware,
   (request, response) => response.status(200).json(request.items)
 );
 
@@ -53,7 +46,12 @@ router.post('/',
     //authUtils.checkSession,    
     EventModel.saveEventMiddleware
   ], 
-  (request, response) => response.status(201).json({"message": "Success"})
+  (request, response) => response.status(201).json({
+    "message": "Success",
+    "token": request.session.uiowa_access_token,
+    "ip": request.ip,
+    "body": request.body
+  })
 );
 
 // PATCH events/:id/:packageId -- Updates an event's packageId
