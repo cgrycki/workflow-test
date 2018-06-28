@@ -98,51 +98,6 @@ function saveTokenToSession(token, request) {
 
 
 /* Middleware -----------*/
-// Clears a user's session from the database on logout/timeout
-function clearTokensFromSession(request, response, next) {
-  let sess = request.session;
-
-  // Clear the data
-  sess.uiowa_access_token = undefined;
-  sess.uiowa_refresh_token = undefined;
-  sess.hawkid = undefined;
-  sess.uid = undefined;
-
-  // Double clear the data
-  sess.destroy();
-
-  // Route back to our login URL in our final callback
-  next();
-}
-
-// Checks if a request is verified or not. 
-function checkSession(request, response, next) {
-  let sess = request.session;
-
-  // Check if they've been here before
-  if (sess && sess.uiowa_access_token) {
-    /* If they have an auth token, check if its timed out
-      if (sess.expires_in > new Date()) {
-        // Not timed out, continue creating/updating/deleteing
-        next();
-      } else {
-        clearTokensFromSession(request, response);
-      }
-    */
-    next();
-  }
-  
-  // Check if this request is being sent to /auth with a valid token
-  if (request.path.endsWith('/auth') && request.query.code) {
-    return next();
-  }
-
-  // No authenticated session token? send them to entry point
-  if (!sess.uiowa_access_token) {
-    response.status(403).redirect(getAuthURL());
-  }
-}
-
 // Authentication handshake with the U. Iowa servers
 async function authenticateCode(request, response, next) {
   const code = request.query.code;
@@ -176,6 +131,34 @@ async function authenticateCode(request, response, next) {
   }
 }
 
+// Checks if a request is verified or not. 
+function checkSession(request, response, next) {
+  let sess = request.session;
+
+  // Check if they've been here before
+  if (sess && sess.uiowa_access_token) {
+    /* If they have an auth token, check if its timed out
+      if (sess.expires_in > new Date()) {
+        // Not timed out, continue creating/updating/deleteing
+        next();
+      } else {
+        clearTokensFromSession(request, response);
+      }
+    */
+    next();
+  }
+  
+  // Check if this request is being sent to /auth with a valid token
+  if (request.path.endsWith('/auth') && request.query.code) {
+    return next();
+  }
+
+  // No authenticated session token? send them to entry point
+  if (!sess.uiowa_access_token) {
+    response.status(403).redirect(getAuthURL());
+  }
+}
+
 // Middelware refreshing a session auth, and passing the user details for /events
 function retrieveSession(request, response, next) {
   let sess = request.session;
@@ -184,8 +167,25 @@ function retrieveSession(request, response, next) {
   request.uiowa_access_token = sess.uiowa_access_token;
 
   // We need the user's IP address to create/update workflow package
-  request.USER_IP_ADDRESS = request.ip || '0.0.0.0';
+  request.user_ip_address = request.ip || '0.0.0.0';
 
+  next();
+}
+
+// Clears a user's session from the database on logout/timeout
+function clearTokensFromSession(request, response, next) {
+  let sess = request.session;
+
+  // Clear the data
+  //sess.uiowa_access_token = undefined;
+  //sess.uiowa_refresh_token = undefined;
+  //sess.hawkid = undefined;
+  //sess.uid = undefined;
+
+  // Double clear the data
+  sess.destroy();
+
+  // Route back to our login URL in our final callback
   next();
 }
 

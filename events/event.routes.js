@@ -43,14 +43,16 @@ router.post('/',
     eventUtils.validParamTextField,
     eventUtils.validParamUserEmail,
     validateParams,
-    //authUtils.checkSession,    
+    //authUtils.checkSession,
+    authUtils.retrieveSession,  
     EventModel.saveEventMiddleware
   ], 
   (request, response) => response.status(201).json({
     "message": "Success",
-    "token": request.session.uiowa_access_token,
+    "token": request.uiowa_access_token,
     "ip": request.ip,
-    "body": request.body
+    "body": request.body,
+    "req": request
   })
 );
 
