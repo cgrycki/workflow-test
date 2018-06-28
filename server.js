@@ -8,6 +8,7 @@ require('dotenv').config();
 /* Dependencies -------------------------------------------------------------*/
 var express      = require('express');
 var path         = require('path');
+var cors         = require('cors');
 var helmet       = require('helmet');
 var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
@@ -21,6 +22,7 @@ var app = express();
 
 /* Further App Configurations -----------------------------------------------*/
 app.use(helmet());          // Security best practices
+app.use(cors());            // Cross origin resource sharing, so we can talk to our frontend
 app.use(logger('dev'));     // Logging
 app.use(cookieParser());    // And cookies
 app.use(bodyParser.json({ type: 'application/json' })); // For JSON headers
