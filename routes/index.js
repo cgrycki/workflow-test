@@ -11,18 +11,21 @@ var authUtils = require('../auth/auth.utils');
  */
 router.get('/', function(req, res) {
   // Gather authentication information
-  req.session.reload();
+  //req.session.reload();
   const accessToken = req.session.uiowa_access_token;
   const code = req.params.code;
 
   // If the user has an access token, we've already authenticated them
   if (accessToken) res.status(302).redirect(process.env.FRONTEND_URI);
+
   // Otherwise send them to auth. If the request contains a code it will
   // be validated by our auth route. If it doesn't it will send them to login
   res.redirect(url.format({
     pathname:"/auth",
     query: req.query
   }));
+
+
 });
 
 module.exports = router;
