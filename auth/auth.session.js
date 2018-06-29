@@ -33,8 +33,7 @@ module.exports = session({
   cookie: {
     maxAge: ONE_HOUR,
     secure: true,
-    httpOnly: false,
-    domain: '*.cloudfront.net'
+    httpOnly: false
   },
   proxy: true
 });
