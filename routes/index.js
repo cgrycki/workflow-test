@@ -26,10 +26,10 @@ router.get('/', function(req, res) {
     //req.pipe(rp(process.env.FRONTEND_URI)).pipe(res);
 
     // Proxy server
-    //
+    proxy(process.env.FRONTEND_URI);
 
     // HTTP get
-    http.get(process.env.FRONTEND_URI, (proxyRes) => proxyRes.pipe(res));
+    //http.get(process.env.FRONTEND_URI, (proxyRes) => proxyRes.pipe(res));
   }
 
   // Otherwise send them to auth. If the request contains a code it will
