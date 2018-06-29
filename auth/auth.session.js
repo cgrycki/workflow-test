@@ -33,8 +33,7 @@ module.exports = session({
   cookie: {
     maxAge: ONE_HOUR,
     secure: true,
-    httpOnly: false,
-    domain: process.env.FRONTEND_URI
+    httpOnly: false
   },
   proxy: true
 });

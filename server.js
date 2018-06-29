@@ -28,19 +28,28 @@ app.use(cors({
 }));                        // Cross origin resource sharing, so we can talk to our frontend
 app.options('*', cors());   // Pre-flight CORS
 app.use(logger('dev'));     // Logging
-//app.use(cookieParser(process.env.MY_AWS_SECRET_ACCESS_KEY)); // And parse our cookies
+app.use(cookieParser(process.env.MY_AWS_SECRET_ACCESS_KEY)); // And parse our cookies
 app.use(bodyParser.json({ type: 'application/json' })); // For JSON headers
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session);           // User Sessions backed by DynamoDB
 app.use(validator());       // API Parameter validation
 app.set('trust proxy', 1); 
 
+// Only use Xray in production environment
 if (process.env.NODE_ENV) {
-  // Only use Xray in production environment
   var xray = require('./utils/xray');
   app.use(xray.startTrace);
   app.use(xray.requestTrace);
 }
+
+// Cross domain cookies
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Credentials', true);
+  res.header('Access-Control-Allow-Origin', req.headers.origin)
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH');
+  res.header('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+  next();
+});
 
 
 // Authentication check
