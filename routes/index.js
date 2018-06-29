@@ -1,4 +1,5 @@
 var proxy     = require('express-http-proxy');
+var http      = require('http');
 var rp        = require('request-promise');
 var express   = require('express');
 var router    = express.Router();
@@ -20,7 +21,15 @@ router.get('/', function(req, res) {
   // If the user has an access token, we've already authenticated them
   if (accessToken) {
     //res.status(302).redirect(process.env.FRONTEND_URI);
-    req.pipe(rp(process.env.FRONTEND_URI)).pipe(res);
+
+    // Request promise
+    //req.pipe(rp(process.env.FRONTEND_URI)).pipe(res);
+
+    // Proxy server
+    //
+
+    // HTTP get
+    http.get(process.env.FRONTEND_URI, (proxyRes) => proxyRes.pipe(res));
   }
 
   // Otherwise send them to auth. If the request contains a code it will
