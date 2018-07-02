@@ -20,13 +20,13 @@ router.get('/', function(req, res) {
 
   // If the user has an access token, we've already authenticated them
   if (accessToken) {
-    //res.status(302).redirect(process.env.FRONTEND_URI);
+    res.status(302).redirect(process.env.FRONTEND_URI);
 
     // Request promise
     //req.pipe(rp(process.env.FRONTEND_URI)).pipe(res);
 
     // Proxy server
-    proxy(process.env.FRONTEND_URI);
+    //proxy(process.env.FRONTEND_URI);
 
     // HTTP get
     //http.get(process.env.FRONTEND_URI, (proxyRes) => proxyRes.pipe(res));
