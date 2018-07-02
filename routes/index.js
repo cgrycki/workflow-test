@@ -21,7 +21,7 @@ router.get('/', function(req, res) {
   // If the user has an access token, we've already authenticated them
   if (accessToken) {
     // Set cookie before the redirect
-    res.cookie({'connect.sid': req.sessionID });
+    //res.cookie({'connect.sid': req.sessionID });
     res.status(302).redirect(process.env.FRONTEND_URI);
 
     // Request promise
