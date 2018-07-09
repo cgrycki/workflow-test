@@ -24,7 +24,7 @@ var app = express();
 app.use(helmet());          // Security best practices
 
 // CORS
-//app.use('*', cors());
+app.options('*', cors());
 const whitelist = [process.env.REDIRECT_URI, process.env.FRONTEND_URI, 'uiowa.edu'];
 app.use(cors({
   origin: whitelist,
@@ -61,7 +61,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(validator());       // API Parameter validation
 app.set('trust proxy', 1);  // Reverse proxy
 app.use(session);           // User Sessions backed by DynamoDB
-
 
 // Only use Xray in production environment
 if (process.env.NODE_ENV) {
