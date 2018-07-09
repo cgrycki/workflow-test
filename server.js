@@ -26,15 +26,15 @@ app.use(helmet());          // Security best practices
 // CORS
 //app.use('*', cors());
 const whitelist = [process.env.REDIRECT_URI, process.env.FRONTEND_URI, 'uiowa.edu'];
-/*app.use(cors({
+app.use(cors({
   origin: whitelist,
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS"
   //, allowedHeaders: 'Content-Type, Origin, X-Amz-Date, Authorization, X-Api-Key, X-Api-Version'
 }));                        // Cross origin resource sharing, so we can talk to our frontend
-*/
+
 // Cross domain cookies: Enables our Lambda function to communicate w/ our frontend
-app.use(function (req, res, next) {
+/*app.use(function (req, res, next) {
   // Dynamically set the access origin
   let origin = req.headers.origin;
   if (whitelist.includes(origin)) {
@@ -51,7 +51,7 @@ app.use(function (req, res, next) {
   
   if (req.method === 'OPTIONS') res.status(200).end();
   else next();
-});
+});*/
 
 
 app.use(logger('dev'));     // Logging
