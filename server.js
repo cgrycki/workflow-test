@@ -26,13 +26,10 @@ app.use(helmet());          // Security best practices
 // Whitelist origins
 const whitelist = [process.env.REDIRECT_URI, process.env.FRONTEND_URI, 'uiowa.edu'];
 app.use(cors({
-  origin: (origin, callback) => {
-    if (whitelist.indexOf(origin) !== -1) callback(null, true)
-    else callback(new Error('Origin not allowed by CORS'))
-  },
+  origin: whitelist,
   credentials: true,
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
-  allowedHeaders: 'Content-Type, Origin, X-Amz-Date, Authorization, X-Api-Key, X-Api-Version'
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS"
+  //, allowedHeaders: 'Content-Type, Origin, X-Amz-Date, Authorization, X-Api-Key, X-Api-Version'
 }));                        // Cross origin resource sharing, so we can talk to our frontend
 //app.('*', cors());
 app.use(logger('dev'));     // Logging
