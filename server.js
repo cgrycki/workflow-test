@@ -23,8 +23,9 @@ var app = express();
 /* Further App Configurations -----------------------------------------------*/
 app.use(helmet());          // Security best practices
 app.use(cors({
-  origin: true,
-  credentials: true
+  origin: [process.env.REDIRECT_URI, process.env.FRONTEND_URI, 'uiowa.edu/'],
+  credentials: true,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
 }));                        // Cross origin resource sharing, so we can talk to our frontend
 app.options('*', cors());   // Pre-flight CORS
 app.use(logger('dev'));     // Logging
@@ -44,7 +45,7 @@ if (process.env.NODE_ENV) {
 }
 
 // Cross domain cookies: Enables our Lambda function to communicate w/ our frontend
-app.use(function (req, res, next) {
+/*app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', process.env.REDIRECT_URI);
   res.header('Access-Control-Allow-Credentials', true);
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
@@ -53,6 +54,7 @@ app.use(function (req, res, next) {
   if (req.method == 'OPTIONS') res.status(200).end();
   else next();
 });
+*/
 
 
 // Authentication check
