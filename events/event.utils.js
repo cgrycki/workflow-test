@@ -69,7 +69,7 @@ const getWorkflowEvent = (request, response, next) => {
  * Submits a workflow routing package.
  * POST submission takes the form of: POST /workflow/{env}/api/developer/forms/{form_id}/packages
  */
-const postWorkflowEvent = (request, response, next) => {
+const postWorkflowEvent = async (request, response, next) => {
   let endpoint = '/workflow/' + process.env.EENV + '/api/developer/forms/' +
     process.env.FORM_ID + '/packages'
 
@@ -79,12 +79,12 @@ const postWorkflowEvent = (request, response, next) => {
     uri: 'https://apps.its.uiowa.edu' + endpoint,
     headers: {
       Accept: 'application/vnd.workflow+json;version=1.1',
-      Authorization: 'Bearer ' + request.session.USER_ACCESS_TOKEN,
-      'X-Client-Remote-Addr': request.ip
+      Authorization: 'Bearer ' + request.session.uiowa_access_token,
+      'X-Client-Remote-Addr': request.user_ip_address
     },
     body: {
       // REQUIRED by workflow
-      state: 'PRE_ROUTING',
+      state: 'ROUTING',
       subType: null,
       emailContent: null,
       // Form data, all fields REQUIRED or null
@@ -96,26 +96,31 @@ const postWorkflowEvent = (request, response, next) => {
     json: true
   };
 
-  rp(options)
+  await rp(options)
     .then(function (parsedBody) {
         // POST succeeded, pass on the packageId from the response to our save events middleware
-        let packageId = parsedBody.actions.packageId;
+        let packageId = parsedBody.id;
         request.packageId = packageId;
+
+        // Add the whole response so we can take a peek
+        request.workflowResponse = parsedBody;
         next();
     })
     .catch(function (err) {
         // POST failed...
-        response.status(422).json({ err: err, stack: err.stack });
+        response.status(422).json({ 
+          err: err, 
+          stack: err.stack,
+          request: options
+        });
     });
 };
 
+//const saveEvent = (request, response, next) => {}
 
 
-// POST - create
-// validate + sanitize
-// Create workflow package:: add response's packageID added to request
-// Save event to database::
 
 exports.validParamTextField = validParamTextField;
 exports.validParamUserEmail = validParamUserEmail;
 exports.validParamId = validParamId;
+exports.postWorkflowEvent = postWorkflowEvent;
