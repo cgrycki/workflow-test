@@ -21,8 +21,9 @@ router.get('/', utils.authenticateCode,
   (request, response) => response.status(200).redirect(process.env.FRONTEND_URI));
 
 // GET /auth/logout -- Ends a user's session and redirects them to the login URL.
-router.get('/logout', utils.clearTokensFromSession, (request, response) => { 
-  response.status(200).redirect(process.env.REDIRECT_URI);
+router.get('/logout', utils.clearTokensFromSession, (request, response) => {
+  // Send them to our entry point to login again
+  response.status(200).json({ 'redirect': process.env.REDIRECT_URI });
 });
 
 
