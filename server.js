@@ -32,7 +32,7 @@ app.use(cookieParser(process.env.MY_AWS_SECRET_ACCESS_KEY)); // And parse our co
 app.use(bodyParser.json({ type: 'application/json' })); // For JSON headers
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(validator());       // API Parameter validation
-app.set('trust proxy', 1); 
+app.set('trust proxy', 1);  // Reverse proxy
 app.use(session);           // User Sessions backed by DynamoDB
 
 
@@ -43,12 +43,11 @@ if (process.env.NODE_ENV) {
   app.use(xray.requestTrace);
 }
 
-// Cross domain cookies
+// Cross domain cookies: Enables our Lambda function to communicate w/ our frontend
 app.use(function (req, res, next) {
   if ( req.method == 'OPTIONS' ) {
-    res.header('Access-Control-Allow-Credentials', true);
-    //res.header('Access-Control-Allow-Origin', req.headers.origin);
     res.header('Access-Control-Allow-Origin', process.env.REDIRECT_URI);
+    res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
     res.header('Access-Control-Allow-Headers', 'X-CSRF-Token, Authorization, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version', 'Content-type');
     res.status(200).end();
@@ -62,18 +61,12 @@ app.use(function (req, res, next) {
 //app.use('*', require('./auth/auth.utils').requiresLogin);
 
 // Routes
-var indexRouter = require('./routes/index');
-var eventRouter = require('./events/event.routes');
-var roomRouter  = require('./rooms/room.routes');
+app.use('/',       require('./routes/index'));
+app.use('/events', require('./events/event.routes'));
+app.use('/rooms',  require('./rooms/room.routes'));
+app.use('/auth',   require('./auth/auth.routes'));
 
-app.use('/', indexRouter);
-app.use('/events', eventRouter);
-app.use('/rooms', roomRouter);
-app.use('/auth', require('./auth/auth.routes'));
-
-if (process.env.NODE_ENV) {
-  app.use(xray.endTrace); // Close Xray
-}
-
+// Close Xray
+if (process.env.NODE_ENV) app.use(xray.endTrace);
 
 module.exports = app;

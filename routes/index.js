@@ -1,6 +1,3 @@
-var proxy     = require('express-http-proxy');
-var http      = require('http');
-var rp        = require('request-promise');
 var express   = require('express');
 var router    = express.Router();
 var url       = require('url');
@@ -16,22 +13,12 @@ router.get('/', function(req, res) {
   // Gather authentication information
   //req.session.reload();cross domain cookies session
   const accessToken = req.session.uiowa_access_token;
-  const code = req.params.code;
 
   // If the user has an access token, we've already authenticated them
   if (accessToken) {
     // Set cookie before the redirect
     //res.cookie({'connect.sid': req.sessionID });
     res.status(302).redirect(process.env.FRONTEND_URI);
-
-    // Request promise
-    //req.pipe(rp(process.env.FRONTEND_URI)).pipe(res);
-
-    // Proxy server
-    //proxy(process.env.FRONTEND_URI);
-
-    // HTTP get
-    //http.get(process.env.FRONTEND_URI, (proxyRes) => proxyRes.pipe(res));
   }
 
   // Otherwise send them to auth. If the request contains a code it will
