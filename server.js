@@ -25,7 +25,7 @@ app.use(helmet());          // Security best practices
 
 // Whitelist origins: [process.env.REDIRECT_URI, process.env.FRONTEND_URI, 'uiowa.edu']
 app.use(cors({
-  origin: true,
+  origin: process.env.FRONTEND_URI,
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
   allowedHeaders: 'Content-Type,Origin,X-Amz-Date,Authorization,X-Api-Key,X-Api-Version'
@@ -48,6 +48,7 @@ if (process.env.NODE_ENV) {
 }
 
 // Cross domain cookies: Enables our Lambda function to communicate w/ our frontend
+/*
 app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', process.env.REDIRECT_URI);
   res.header('Access-Control-Allow-Credentials', true);
@@ -57,7 +58,7 @@ app.use(function (req, res, next) {
   if (req.method === 'OPTIONS') res.status(200).end();
   else next();
 });
-
+*/
 
 
 
