@@ -23,11 +23,11 @@ var app = express();
 /* Further App Configurations -----------------------------------------------*/
 app.use(helmet());          // Security best practices
 app.use(cors({
-  origin: [process.env.REDIRECT_URI, process.env.FRONTEND_URI, 'uiowa.edu/'],
+  origin: [process.env.REDIRECT_URI, process.env.FRONTEND_URI, 'uiowa.edu'],
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
 }));                        // Cross origin resource sharing, so we can talk to our frontend
-app.options('*', cors());   // Pre-flight CORS
+//app.options('*', cors());   // Pre-flight CORS
 app.use(logger('dev'));     // Logging
 app.use(cookieParser(process.env.MY_AWS_SECRET_ACCESS_KEY)); // And parse our cookies
 app.use(bodyParser.json({ type: 'application/json' })); // For JSON headers
