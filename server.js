@@ -26,6 +26,7 @@ app.use(cors({
   origin: [process.env.REDIRECT_URI, process.env.FRONTEND_URI, 'uiowa.edu'],
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+  allowedHeaders: 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Api-Version'
 }));                        // Cross origin resource sharing, so we can talk to our frontend
 
 app.use(logger('dev'));     // Logging
