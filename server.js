@@ -23,12 +23,16 @@ var app = express();
 /* Further App Configurations -----------------------------------------------*/
 app.use(helmet());          // Security best practices
 
-// Whitelist origins: [process.env.REDIRECT_URI, process.env.FRONTEND_URI, 'uiowa.edu']
+// Whitelist origins
+const whitelist = [process.env.REDIRECT_URI, process.env.FRONTEND_URI, 'uiowa.edu'];
 app.use(cors({
-  origin: [process.env.REDIRECT_URI, process.env.FRONTEND_URI, 'uiowa.edu'],
+  origin: (origin, callback) => {
+    if (whitelist.indexOf(origin) !== -1) callback(null, true)
+    else callback(new Error('Origin not allowed by CORS'))
+  },
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
-  allowedHeaders: 'Content-Type,Origin,X-Amz-Date,Authorization,X-Api-Key,X-Api-Version'
+  allowedHeaders: 'Content-Type, Origin, X-Amz-Date, Authorization, X-Api-Key, X-Api-Version'
 }));                        // Cross origin resource sharing, so we can talk to our frontend
 //app.('*', cors());
 app.use(logger('dev'));     // Logging
@@ -54,7 +58,10 @@ app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Credentials', true);
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
   res.header('Access-Control-Allow-Headers', 'X-CSRF-Token, Authorization, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version', 'Content-type');
-
+  
+  //"X-Requested-With": '*',
+  //"Access-Control-Allow-Headers": 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with',
+  
   if (req.method === 'OPTIONS') res.status(200).end();
   else next();
 });
