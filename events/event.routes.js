@@ -45,7 +45,7 @@ router.post('/',
     validateParams,
     //authUtils.checkSession,
     authUtils.retrieveSession,
-    eventUtils.postWorkflowEvent
+    //eventUtils.postWorkflowEvent
     //EventModel.saveEventMiddleware
   ], 
   (request, response) => response.status(201).json({
