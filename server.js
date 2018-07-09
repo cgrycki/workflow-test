@@ -27,7 +27,7 @@ app.use(cors({
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
 }));                        // Cross origin resource sharing, so we can talk to our frontend
-//app.options('*', cors());   // Pre-flight CORS
+
 app.use(logger('dev'));     // Logging
 app.use(cookieParser(process.env.MY_AWS_SECRET_ACCESS_KEY)); // And parse our cookies
 app.use(bodyParser.json({ type: 'application/json' })); // For JSON headers
@@ -45,9 +45,9 @@ if (process.env.NODE_ENV) {
 }
 
 // Cross domain cookies: Enables our Lambda function to communicate w/ our frontend
-/*
+
 app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URI);
+  res.header('Access-Control-Allow-Origin', process.env.REDIRECT_URI);
   res.header('Access-Control-Allow-Credentials', true);
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
   res.header('Access-Control-Allow-Headers', 'X-CSRF-Token, Authorization, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version', 'Content-type');
@@ -55,7 +55,7 @@ app.use(function (req, res, next) {
   if (req.method === 'OPTIONS') res.status(200).end();
   else next();
 });
-*/
+
 
 
 
