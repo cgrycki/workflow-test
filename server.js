@@ -24,15 +24,36 @@ var app = express();
 app.use(helmet());          // Security best practices
 
 // CORS
-app.use('*', cors());
-// Whitelist origins
+//app.use('*', cors());
 const whitelist = [process.env.REDIRECT_URI, process.env.FRONTEND_URI, 'uiowa.edu'];
-app.use(cors({
+/*app.use(cors({
   origin: whitelist,
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS"
   //, allowedHeaders: 'Content-Type, Origin, X-Amz-Date, Authorization, X-Api-Key, X-Api-Version'
 }));                        // Cross origin resource sharing, so we can talk to our frontend
+*/
+// Cross domain cookies: Enables our Lambda function to communicate w/ our frontend
+app.use(function (req, res, next) {
+  // Dynamically set the access origin
+  let origin = req.headers.origin;
+  if (whitelist.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+
+  //res.header('Access-Control-Allow-Origin', process.env.REDIRECT_URI);
+  res.header('Access-Control-Allow-Credentials', true);
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'X-CSRF-Token, Authorization, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version', 'Content-type');
+  
+  //"X-Requested-With": '*',
+  //"Access-Control-Allow-Headers": 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with',
+  
+  if (req.method === 'OPTIONS') res.status(200).end();
+  else next();
+});
+
+
 app.use(logger('dev'));     // Logging
 app.use(cookieParser(process.env.MY_AWS_SECRET_ACCESS_KEY)); // And parse our cookies
 app.use(bodyParser.json({ type: 'application/json' })); // For JSON headers
@@ -48,20 +69,6 @@ if (process.env.NODE_ENV) {
   app.use(xray.startTrace);
   app.use(xray.requestTrace);
 }
-
-// Cross domain cookies: Enables our Lambda function to communicate w/ our frontend
-/*app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', process.env.REDIRECT_URI);
-  res.header('Access-Control-Allow-Credentials', true);
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'X-CSRF-Token, Authorization, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version', 'Content-type');
-  
-  //"X-Requested-With": '*',
-  //"Access-Control-Allow-Headers": 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with',
-  
-  if (req.method === 'OPTIONS') res.status(200).end();
-  else next();
-});*/
 
 
 
