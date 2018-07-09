@@ -38,7 +38,6 @@ function getAuthURL() {
   return returnVal;
 }
 
-
 // Preform server handshake with code from getAuthURL(), saves callback data to session
 async function getAuthTokenFromCode(auth_code, request) {
   /* POST https://login.uiowa.edu/uip/token.page?
@@ -66,7 +65,6 @@ async function getAuthTokenFromCode(auth_code, request) {
   return token;
 }
 
-
 // Saves a user token values to their session
 function saveTokenToSession(token, request) {
   /* Token = {
@@ -89,12 +87,12 @@ function saveTokenToSession(token, request) {
   sess.uiowa_refresh_token = token.token.refresh_token;
   // Save the expiration time
   sess.expires_in = token.token.expires_in;
+
   // Save alphanumeric HawkID
   //sess.hawkid = token.token.hawkid;
   // Save University ID interger
   //sess.uid = token.token.uid;
 }
-
 
 
 /* Middleware -----------*/
@@ -184,6 +182,9 @@ function clearTokensFromSession(request, response, next) {
   if (request.session && request.session.uiowa_access_token) {
     request.session.destroy();
   }
+
+  // Clear the frontend cookie regardless if they're logged in or not
+  response.clearCookie('connect.sid');
   next();
 }
 
