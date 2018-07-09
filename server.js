@@ -44,7 +44,7 @@ app.use(function (req, res, next) {
   //res.header('Access-Control-Allow-Origin', process.env.REDIRECT_URI);
   res.header('Access-Control-Allow-Credentials', true);
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'X-CSRF-Token, Authorization, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version', 'Content-type');
+  res.header('Access-Control-Allow-Headers', 'X-CSRF-Token,Authorization,X-Requested-With,Accept,Accept-Version,Content-Length,Content-MD5,Content-Type,Date,X-Api-Version,Content-type,Origin');
   
   //"X-Requested-With": '*',
   //"Access-Control-Allow-Headers": 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with',
