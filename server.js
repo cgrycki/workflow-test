@@ -23,6 +23,8 @@ var app = express();
 /* Further App Configurations -----------------------------------------------*/
 app.use(helmet());          // Security best practices
 
+// CORS
+app.use('*', cors());
 // Whitelist origins
 const whitelist = [process.env.REDIRECT_URI, process.env.FRONTEND_URI, 'uiowa.edu'];
 app.use(cors({
@@ -31,7 +33,6 @@ app.use(cors({
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS"
   //, allowedHeaders: 'Content-Type, Origin, X-Amz-Date, Authorization, X-Api-Key, X-Api-Version'
 }));                        // Cross origin resource sharing, so we can talk to our frontend
-app.use('*', cors());
 app.use(logger('dev'));     // Logging
 app.use(cookieParser(process.env.MY_AWS_SECRET_ACCESS_KEY)); // And parse our cookies
 app.use(bodyParser.json({ type: 'application/json' })); // For JSON headers
