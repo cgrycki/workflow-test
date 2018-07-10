@@ -30,7 +30,6 @@ const cors_options = {
   origin: whitelist_domains,
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
-  optionsSuccessStatus: 200,
   allowedHeaders: whitelist_headers
 };
 app.use(cors(cors_options));// Cross origin resource sharing, so we can talk to our frontend
