@@ -26,8 +26,8 @@ app.use(helmet());          // Security best practices
 
 // CORS
 // Cross origin resource sharing, so we can talk to our frontend
-//app.use(cors(custCors.cors_options));
-app.use(custCors.customCors);
+app.use(cors(custCors.cors_options));
+//app.use(custCors.customCors);
 app.options('*', cors());   // CORS for preflight requests
 
 
