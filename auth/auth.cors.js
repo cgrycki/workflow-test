@@ -35,7 +35,8 @@ const cors_options = {
  */
 const customCors = (request, response, next) => {
   // Check to see if the request is coming from a domain in our whitelist
-  if (whitelist_domains.indexOf(request.header('Origin')) !== -1) {
+  if ((whitelist_domains.indexOf(request.header('Origin')) !== -1) ||
+      (!request.header('Origin'))) {
 
     // Allow client's and set credentials to true
     response.header('Access-Control-Allow-Origin', request.header('Origin'));
