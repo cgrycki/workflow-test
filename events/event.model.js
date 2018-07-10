@@ -80,7 +80,6 @@ EventModel.checkEventMiddleware = function(request, response, next) {
  */
 EventModel.listEvents = function(request, response) {
   return this
-    .cors()
     .scan()
     .exec((error, data) => {
       if (error) return response.status(400).json({ error: JSON.stringify(error) });
@@ -95,6 +94,7 @@ EventModel.listEvents = function(request, response) {
  */
 EventModel.listEventsMiddleware = function(request, response, next) {
   EventModel
+    .cors()
     .scan()
     .exec((error, data) => {
       if (error) return response.status(400).json({ error: JSON.stringify(error), stack: error.stack });
