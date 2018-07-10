@@ -93,6 +93,7 @@ EventModel.listEvents = function(request, response) {
  * @param {object} response Express HTTP response to act upon.
  */
 EventModel.listEventsMiddleware = function(request, response, next) {
+  cors()
   EventModel
     .scan()
     .exec((error, data) => {

@@ -23,10 +23,7 @@ const authUtils = require('../auth/auth.utils');
 /* CRUD API -----------------------------------------------------------------*/
 // GET events -- List events
 router.get('/',
-  [
-    EventModel.listEventsMiddleware,
-    cors()
-  ],
+  EventModel.listEventsMiddleware,
   (request, response) => response.status(200).json(request.items)
 );
 
