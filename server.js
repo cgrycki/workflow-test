@@ -9,6 +9,7 @@ require('dotenv').config();
 var express      = require('express');
 var path         = require('path');
 var cors         = require('cors');
+var custCors     = require('./auth/auth.cors');
 var helmet       = require('helmet');
 var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
@@ -24,24 +25,11 @@ var app = express();
 app.use(helmet());          // Security best practices
 
 // CORS
-const whitelist_domains = [process.env.REDIRECT_URI, process.env.FRONTEND_URI, 'uiowa.edu'];
-const whitelist_headers = [
-  'Authorization', 'Content-Type', 'Content-type', 
-  'Origin', 'origin', 'X-Amz-Date', 'X-Requested-With', 'x-requested-with', 
-  'Access-Control-Request-Headers', 'Access-Control-Request-Method', 
-  'Access-Control-Request-Origin', 'Access-Control-Request-Credentials',
-  'Access-Control-Allow-Origin', 'Access-Control-Allow-Credentials',
-  'access-control-allow-origin', 'access-control-allow-credentials',
-  'Cache-Control', 'cache-control'
-];
-const cors_options = {
-  origin: whitelist_domains,
-  credentials: true,
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
-  allowedHeaders: whitelist_headers
-};
-app.use(cors(cors_options));// Cross origin resource sharing, so we can talk to our frontend
+// Cross origin resource sharing, so we can talk to our frontend
+//app.use(cors(custCors.cors_options));
+app.use(custCors.customCors);
 app.options('*', cors());   // CORS for preflight requests
+
 
 app.use(logger('dev'));     // Logging
 app.use(cookieParser(process.env.MY_AWS_SECRET_ACCESS_KEY)); // And parse our cookies
