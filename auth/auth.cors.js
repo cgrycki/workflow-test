@@ -39,14 +39,15 @@ const customCors = (request, response, next) => {
     if (whitelist_domains.indexOf(request.header('Origin')) !== -1) {
 
       // Allow client's and set credentials to true
-      response.header('Accept-Control-Allow-Origin', request.header('Origin'));
-      response.header('Accept-Control-Allow-Credentials', true);
+      response.header('Access-Control-Allow-Origin', request.header('Origin'));
+      response.header('Access-Control-Allow-Credentials', true);
 
-      // Allow the following HTTP Methods
+      // Allow the following HTTP Methods and headers
       response.header('Access-Control-Allow-Methods', whitelist_methods);
+      response.header('Access-Control-Allow-Headers', whitelist_headers);
 
       // From: https://serverfault.com/questions/856904/chrome-s3-cloudfront-no-access-control-allow-origin-header-on-initial-xhr-req
-      if (!request.header('vary')) response.header('vary', 'origin');
+      if (!request.header('vary')) response.header('vary', 'Origin');
       response.status(204).end();
 
     }
