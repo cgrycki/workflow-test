@@ -25,7 +25,14 @@ app.use(helmet());          // Security best practices
 
 // CORS
 const whitelist_domains = [process.env.REDIRECT_URI, process.env.FRONTEND_URI, 'uiowa.edu'];
-const whitelist_headers = ['Authorization', 'Content-Type', 'Content-type', 'Origin', 'origin', 'X-Amz-Date', 'X-Requested-With', 'x-requested-with', 'Access-Control-Request-Headers', 'Access-Control-Request-Method', 'Access-Control-Request-Origin', 'Access-Control-Request-Credentials', 'Cache-Control'];
+const whitelist_headers = [
+  'Authorization', 'Content-Type', 'Content-type', 
+  'Origin', 'origin', 'X-Amz-Date', 'X-Requested-With', 'x-requested-with', 
+  'Access-Control-Request-Headers', 'Access-Control-Request-Method', 
+  'Access-Control-Request-Origin', 'Access-Control-Request-Credentials',
+  'Access-Control-Allow-Origin', 'Access-Control-Allow-Credentials',
+  'Cache-Control'
+];
 const cors_options = {
   origin: whitelist_domains,
   credentials: true,
