@@ -34,32 +34,30 @@ const cors_options = {
  * @param {function} next Next function in our server's middleware
  */
 const customCors = (request, response, next) => {
-  if (request.method === 'OPTIONS') {
-    // Check to see if the request is coming from a domain in our whitelist
-    if (whitelist_domains.indexOf(request.header('Origin')) !== -1) {
+  // Check to see if the request is coming from a domain in our whitelist
+  if (whitelist_domains.indexOf(request.header('Origin')) !== -1) {
 
-      // Allow client's and set credentials to true
-      response.header('Access-Control-Allow-Origin', request.header('Origin'));
-      response.header('Access-Control-Allow-Credentials', true);
+    // Allow client's and set credentials to true
+    response.header('Access-Control-Allow-Origin', request.header('Origin'));
+    response.header('Access-Control-Allow-Credentials', true);
 
-      // Allow the following HTTP Methods and headers
-      response.header('Access-Control-Allow-Methods', whitelist_methods);
-      response.header('Access-Control-Allow-Headers', whitelist_headers);
+    // Allow the following HTTP Methods and headers
+    response.header('Access-Control-Allow-Methods', whitelist_methods);
+    response.header('Access-Control-Allow-Headers', whitelist_headers);
 
-      // From: https://serverfault.com/questions/856904/chrome-s3-cloudfront-no-access-control-allow-origin-header-on-initial-xhr-req
-      if (!request.header('vary')) response.header('vary', 'Origin');
-      response.status(204).end();
-
-    }
-    // The request is not coming from our whitelist. 
-    else {
-      response.status(502).json({ 
-        err: 'Not allowed from this domain.',
-        headers: request.headers
-      });
-    }
-  } else {
-    next();
+    // From: https://serverfault.com/questions/856904/chrome-s3-cloudfront-no-access-control-allow-origin-header-on-initial-xhr-req
+    if (!request.header('vary')) response.header('vary', 'Origin');
+    
+    // Send the head back if this is an options preflight request
+    if (request.method === 'OPTIONS') response.status(204).end();
+    else next();
+  }
+  // The request is not coming from our whitelist. 
+  else {
+    response.status(502).json({ 
+      err: 'Not allowed from this domain.',
+      headers: request.headers
+    });
   }
 };
 
