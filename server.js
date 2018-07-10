@@ -31,7 +31,8 @@ const whitelist_headers = [
   'Access-Control-Request-Headers', 'Access-Control-Request-Method', 
   'Access-Control-Request-Origin', 'Access-Control-Request-Credentials',
   'Access-Control-Allow-Origin', 'Access-Control-Allow-Credentials',
-  'Cache-Control'
+  'access-control-allow-origin', 'access-control-allow-credentials',
+  'Cache-Control', 'cache-control'
 ];
 const cors_options = {
   origin: whitelist_domains,
