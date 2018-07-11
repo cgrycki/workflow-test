@@ -3,12 +3,12 @@
  * TBD: Office365 credentials and authentication 'flow'
  */
 
-/* Dependencies --------*/
+/* Dependencies -------------------------------------------------------------*/
 const { check } = require('express-validator/check');
 const oauth2    = require('simple-oauth2');
 
 
-/* Credentials ----*/
+/* Credentials --------------------------------------------------------------*/
 const oauth_uiowa = oauth2.create({
   client: {
     id    : process.env.UIOWA_ACCESS_KEY_ID,
@@ -22,11 +22,11 @@ const oauth_uiowa = oauth2.create({
 });
 
 
-/* Parameters -----------*/
+/* Parameters ---------------------------------------------------------------*/
 const validParamCode = check('code').exists().isAlphanumeric();
 
 
-/* Utilities -----------*/
+/* Utilities ----------------------------------------------------------------*/
 // Get authorization URL for logging in and redirecting back to  API w/ code.
 function getAuthURL() {
   const returnVal = oauth_uiowa.authorizationCode.authorizeURL({
@@ -95,7 +95,7 @@ function saveTokenToSession(token, request) {
 }
 
 
-/* Middleware -----------*/
+/* Middlewares --------------------------------------------------------------*/
 // Authentication handshake with the U. Iowa servers
 async function authenticateCode(request, response, next) {
   const code = request.query.code;
@@ -110,21 +110,17 @@ async function authenticateCode(request, response, next) {
 
       // Token checks out, values are saved. Send them to fill form on client.
       return next();
-      /*return response.status(200).json({
-        token: token,
-        session: request.session,
-        cookies: request.cookies
-      });*/
-    } catch (error) {
-      console.error(error, error.stack);
+    } 
+    catch (error) {
       response.status(500).json({ 
-        error: error, 
+        message: 'Error while authenticating token',
+        error: error.message, 
         stack: error.stack,
-        token: token 
+        token: token
       });
     }
   } else {
-    // Typically sent from /. Redirect to login URL 
+    // No authentication code. Redirect to login URL 
     response.status(403).redirect(getAuthURL());
   }
 }
@@ -135,26 +131,28 @@ function checkSession(request, response, next) {
 
   // Check if they've been here before
   if (sess && sess.uiowa_access_token) {
-    /* If they have an auth token, check if its timed out
-      if (sess.expires_in > new Date()) {
-        // Not timed out, continue creating/updating/deleteing
-        next();
-      } else {
-        clearTokensFromSession(request, response);
-      }
+    // We have a token, but is it expired?
+    // Expire 5 minutes early to account for clock differences
+    /*const expires = sess.cookie.expires;
+    const FIVE_MINUTES = 300000;
+    const expiration = new Date(parseFloat(expires - FIVE_MINUTES));
+    
+    // Token is fine, return next middleware
+    if (expiration > new Date()) next();
+
+    // Expired, refresh token and save values to session
+    const refresh_token = sess.uiowa_refresh_token; 
+    ASYNC const new_token = await oauth_uiowa.accessToken.create({refresh_token: refresh_token}).refresh();
+    saveTokenToSession(new_token, request);
     */
     next();
   }
   
   // Check if this request is being sent to /auth with a valid token
-  if (request.path.endsWith('/auth') && request.query.code) {
-    return next();
-  }
+  if (request.path.endsWith('/auth') && request.query.code) next();
 
   // No authenticated session token? send them to entry point
-  if (!sess.uiowa_access_token) {
-    response.status(403).redirect(getAuthURL());
-  }
+  response.status(403).redirect(getAuthURL());
 }
 
 // Middelware refreshing a session auth, and passing the user details for /events
