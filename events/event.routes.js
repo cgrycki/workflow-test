@@ -12,6 +12,7 @@
 /* Router dependencies ------------------------------------------------------*/
 const express   = require('express');
 var    router   = express.Router();
+var multer      = require('multer')();
 var EventModel  = new require('./event.model');
 
 // TESTING
@@ -40,6 +41,7 @@ router.get('/:id',
 // POST events -- Create new Event
 router.post('/', 
   [
+    multer.fields([]),
     eventUtils.validParamTextField,
     eventUtils.validParamUserEmail,
     validateParams,

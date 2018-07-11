@@ -12,7 +12,6 @@ var cors         = require('cors');
 var customCors   = require('./utils/customCors');
 var helmet       = require('helmet');
 var cookieParser = require('cookie-parser');
-var multer       = require('multer')();
 var bodyParser   = require('body-parser');
 var session      = require('./auth/auth.session');
 var validator    = require('express-validator');
@@ -26,19 +25,17 @@ var app = express();
 app.use(logger('dev'));     // Logging
 app.use(helmet());          // Security best practices
 
-// CORS
-// Cross origin resource sharing, so we can talk to our frontend
-app.use(cors(customCors.cors_options));
+// CORS: Cross origin resource sharing, so we can talk to our frontend
 //app.use(custCors.customCors);
+app.use(cors(customCors.cors_options));
 app.options('*', cors());   // CORS for preflight requests
-
 
 // Parsing
 app.use(cookieParser(process.env.MY_AWS_SECRET_ACCESS_KEY)); // Parse cookies
-app.use(bodyParser.json({ type: 'application/json' }));      // JSON body parsing
-app.use(bodyParser.urlencoded({ extended: true }));          // URL encoded parsing
+app.use(bodyParser.json({ type: 'application/json' }));      // applicatin/json parsing
+app.use(bodyParser.urlencoded({ extended: true }));          // application/www-url parsing
 app.use(validator());                                        // API Parameter validation
-app.use(multer.fields());                                    // Form Data Parsing
+
 app.set('trust proxy', 1);  // Reverse proxy
 app.use(session);           // User Sessions backed by DynamoDB
 
@@ -53,7 +50,7 @@ if (process.env.NODE_ENV) {
 // Authentication check
 //app.use('*', require('./auth/auth.utils').requiresLogin);
 
-// Routes
+/* ROUTES -------------------------------------------------------------------*/
 app.use('/',       require('./routes/index'));
 app.use('/events', require('./events/event.routes'));
 app.use('/rooms',  require('./rooms/room.routes'));
