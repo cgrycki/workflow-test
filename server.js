@@ -56,6 +56,9 @@ app.use('/events', require('./events/event.routes'));
 app.use('/rooms',  require('./rooms/room.routes'));
 app.use('/auth',   require('./auth/auth.routes'));
 
+// Error Handling
+app.use('*',      require('./utils/errors').handleErrors);
+
 // Close Xray
 if (process.env.NODE_ENV) app.use(xray.endTrace);
 
