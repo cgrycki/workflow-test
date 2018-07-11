@@ -2,10 +2,8 @@
 * Express Server
 */
 
-// Environment variables
-require('dotenv').config();
-
 /* Dependencies -------------------------------------------------------------*/
+require('dotenv').config();             // Environment variables
 var express      = require('express');
 var path         = require('path');
 var cors         = require('cors');
@@ -16,19 +14,16 @@ var bodyParser   = require('body-parser');
 var session      = require('./auth/auth.session');
 var validator    = require('express-validator');
 var logger       = require('morgan');
-
-
-// App Instance
 var app = express();
+
 
 /* Further App Configurations -----------------------------------------------*/
 app.use(logger('dev'));     // Logging
 app.use(helmet());          // Security best practices
 
 // CORS: Cross origin resource sharing, so we can talk to our frontend
-//app.use(custCors.customCors);
 app.use(cors(customCors.cors_options));
-app.options('*', cors());   // CORS for preflight requests
+app.options('*', cors());
 
 // Parsing
 app.use(cookieParser(process.env.MY_AWS_SECRET_ACCESS_KEY)); // Parse cookies
@@ -36,6 +31,7 @@ app.use(bodyParser.json({ type: 'application/json' }));      // applicatin/json 
 app.use(bodyParser.urlencoded({ extended: true }));          // application/www-url parsing
 app.use(validator());                                        // API Parameter validation
 
+// Sessions and Proxies
 app.set('trust proxy', 1);  // Reverse proxy
 app.use(session);           // User Sessions backed by DynamoDB
 
@@ -47,17 +43,12 @@ if (process.env.NODE_ENV) {
 }
 
 
-// Authentication check
-//app.use('*', require('./auth/auth.utils').requiresLogin);
-
 /* ROUTES -------------------------------------------------------------------*/
+//app.use('*', require('./auth/auth.utils').requiresLogin);
 app.use('/',       require('./routes/index'));
 app.use('/events', require('./events/event.routes'));
 app.use('/rooms',  require('./rooms/room.routes'));
 app.use('/auth',   require('./auth/auth.routes'));
-
-// Error Handling
-app.use('*',      require('./utils/errors').handleErrors);
 
 // Close Xray
 if (process.env.NODE_ENV) app.use(xray.endTrace);
