@@ -1,5 +1,5 @@
 /**
- * Authorization via DynamoDB Sessions
+ * Authorization via DynamoDB Sessions. Persist user data to the sessions
  */
 
 // Session database table name
@@ -23,12 +23,13 @@ const dynamo_options = {
     region         : process.env.MY_AWS_REGION
   }
 };
+
 const ONE_HOUR = 60 * 60 * 1000;
 
 module.exports = session({
   store: new DynamoDBStore(dynamo_options), 
   secret: process.env.MY_AWS_SECRET_ACCESS_KEY,
-  resave: false, // change when we get a handle at a persisting login state
+  resave: false,
   saveUninitialized: false,
   cookie: {
     maxAge: ONE_HOUR,
