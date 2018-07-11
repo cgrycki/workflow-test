@@ -19,50 +19,14 @@ const whitelist_headers = [
 // Whitelist of HTTP Methods
 const whitelist_methods = 'GET,PUT,POST,DELETE,PATCH,OPTIONS';
 
-// CORS options for npm's CORS
+// CORS options for npm's CORS package
 const cors_options = {
-  origin        : whitelist_domains,
   credentials   : true,
+  origin        : whitelist_domains,
   methods       : whitelist_methods,
   allowedHeaders: whitelist_headers
-};
-
-/**
- * 
- * @param {object} request Incoming HTTP request object.
- * @param {object} response Outgoing HTTP Response object.
- * @param {function} next Next function in our server's middleware
- */
-const customCors = (request, response, next) => {
-  // Check to see if the request is coming from a domain in our whitelist
-  if ((whitelist_domains.indexOf(request.header('Origin')) !== -1) ||
-      (!request.header('Origin'))) {
-
-    // Allow client's and set credentials to true
-    response.header('Access-Control-Allow-Origin', request.header('Origin'));
-    response.header('Access-Control-Allow-Credentials', true);
-
-    // Allow the following HTTP Methods and headers
-    response.header('Access-Control-Allow-Methods', whitelist_methods);
-    response.header('Access-Control-Allow-Headers', whitelist_headers);
-
-    // From: https://serverfault.com/questions/856904/chrome-s3-cloudfront-no-access-control-allow-origin-header-on-initial-xhr-req
-    if (!request.header('vary')) response.header('vary', 'Origin');
-    
-    // Send the head back if this is an options preflight request
-    if (request.method === 'OPTIONS') response.status(204).end();
-    else next();
-  }
-  // The request is not coming from our whitelist. 
-  else {
-    response.status(502).json({ 
-      err: 'Not allowed from this domain.',
-      headers: request.headers
-    });
-  }
 };
 
 exports.whitelist_domains = whitelist_domains;
 exports.whitelist_headers = whitelist_headers;
 exports.cors_options      = cors_options;
-exports.customCors        = customCors;
