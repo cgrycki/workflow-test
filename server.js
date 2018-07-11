@@ -12,6 +12,7 @@ var cors         = require('cors');
 var customCors   = require('./utils/customCors');
 var helmet       = require('helmet');
 var cookieParser = require('cookie-parser');
+var multer       = require('multer')();
 var bodyParser   = require('body-parser');
 var session      = require('./auth/auth.session');
 var validator    = require('express-validator');
@@ -22,6 +23,7 @@ var logger       = require('morgan');
 var app = express();
 
 /* Further App Configurations -----------------------------------------------*/
+app.use(logger('dev'));     // Logging
 app.use(helmet());          // Security best practices
 
 // CORS
@@ -31,11 +33,12 @@ app.use(cors(customCors.cors_options));
 app.options('*', cors());   // CORS for preflight requests
 
 
-app.use(logger('dev'));     // Logging
-app.use(cookieParser(process.env.MY_AWS_SECRET_ACCESS_KEY)); // And parse our cookies
-app.use(bodyParser.json({ type: 'application/json' })); // For JSON headers
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(validator());       // API Parameter validation
+// Parsing
+app.use(cookieParser(process.env.MY_AWS_SECRET_ACCESS_KEY)); // Parse cookies
+app.use(bodyParser.json({ type: 'application/json' }));      // JSON body parsing
+app.use(bodyParser.urlencoded({ extended: true }));          // URL encoded parsing
+app.use(validator());                                        // API Parameter validation
+app.use(multer.fields());                                    // Form Data Parsing
 app.set('trust proxy', 1);  // Reverse proxy
 app.use(session);           // User Sessions backed by DynamoDB
 
