@@ -159,22 +159,28 @@ function checkSession(request, response, next) {
 
 // Middelware refreshing a session auth, and passing the user details for /events
 function retrieveSession(request, response, next) {
-  // Define and load the session
-  let sess = request.session;
-  sess.reload();
+  try {
+    // Define and load the session
+    let sess = request.session;
 
-  // Set all the info needed by later middleware in /events.
-  // We need user access (oauth) token to create/update workflow package
-  request.uiowa_access_token = sess.uiowa_access_token;
+    // Set all the info needed by later middleware in /events.
+    // We need user access (oauth) token to create/update workflow package
+    request.uiowa_access_token = sess.uiowa_access_token;
 
-  // We need the user's IP address to create/update workflow package
-  request.user_ip_address = (request.headers['x-forwarded-for'] ||
-    request.connection.remoteAddress ||
-    request.socket.remoteAddress ||
-    request.connection.socket.remoteAddress).split(",")[0];
+    // We need the user's IP address to create/update workflow package
+    request.user_ip_address = (request.headers['x-forwarded-for'] ||
+      request.connection.remoteAddress ||
+      request.socket.remoteAddress ||
+      request.connection.socket.remoteAddress).split(",")[0];
 
-
-  next();
+    next();
+  } catch (error) {
+    // Error in retrieving our session
+    response.status(502).json({
+      error: error.message,
+      stack: error.stack
+    });
+  }
 }
 
 // Clears a user's session from the database on logout/timeout
