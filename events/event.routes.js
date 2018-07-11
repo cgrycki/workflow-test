@@ -13,9 +13,10 @@
 const express   = require('express');
 var    router   = express.Router();
 var multer      = require('multer')();
-var EventModel  = new require('./event.model');
 
-// TESTING
+
+/* Created dependencies -----------------------------------------------------*/
+var EventModel  = new require('./event.model');
 const validateParams = require('../utils/index').validateParams;
 const eventUtils = require('./event.utils');
 const authUtils = require('../auth/auth.utils');
