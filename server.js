@@ -9,7 +9,7 @@ require('dotenv').config();
 var express      = require('express');
 var path         = require('path');
 var cors         = require('cors');
-var custCors     = require('./auth/auth.cors');
+var customCors   = require('./utils/customCors');
 var helmet       = require('helmet');
 var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
@@ -26,7 +26,7 @@ app.use(helmet());          // Security best practices
 
 // CORS
 // Cross origin resource sharing, so we can talk to our frontend
-app.use(cors(custCors.cors_options));
+app.use(cors(customCors.cors_options));
 //app.use(custCors.customCors);
 app.options('*', cors());   // CORS for preflight requests
 
